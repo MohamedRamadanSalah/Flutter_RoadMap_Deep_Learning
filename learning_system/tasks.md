@@ -689,6 +689,78 @@ M6 — UI Architecture:
 
 **Exit Criteria:** Share event link → tap → app opens to event detail. Push received in all app states. QR check-in works end-to-end.
 
+```
+M7 — Platform Integration Map:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                DEEP LINKING                                     │
+  │                                                                 │
+  │   ┌──────────────────────┐    ┌──────────────────────┐          │
+  │   │ Android App Links    │    │ iOS Universal Links  │          │
+  │   │ assetlinks.json      │    │ AASA file            │          │
+  │   │ autoVerify=true      │    │ Associated Domains   │          │
+  │   └──────────┬───────────┘    └──────────┬───────────┘          │
+  │              └──────────┬───────────────┘                       │
+  │                         ▼                                       │
+  │                   app_links                                     │
+  │                    package                                      │
+  │                         │                                       │
+  │             ┌───────────┴───────────┐                           │
+  │             │   GoRouter resolves   │                           │
+  │             │    /events/:id  ───▶ EventDetailScreen             │
+  │             │    /tickets/:id ───▶ TicketDetailScreen            │
+  │             └───────────────────────┘                           │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │             PUSH NOTIFICATIONS                                  │
+  │                                                                 │
+  │   ┌─────────────┐                                               │
+  │   │ FCM Server  │                                               │
+  │   └──────┬──────┘                                               │
+  │          │  message payload                                     │
+  │          ▼                                                      │
+  │   ┌─────────────────────────────────────────┐                   │
+  │   │      firebase_messaging                 │                   │
+  │   │                                         │                   │
+  │   │  ┌─────────┐ ┌────────────┐ ┌────────┐  │                   │
+  │   │  │Foreground│ │ Background │ │Terminat│  │                   │
+  │   │  │ onMsg    │ │ onBgMsg() │ │ getInit│  │                   │
+  │   │  └────┬────┘ └─────┬──────┘ └───┬────┘  │                   │
+  │   │       │            │            │       │                   │
+  │   │       ▼            ▼            ▼       │                   │
+  │   │  flutter_local_notifications            │                   │
+  │   │       (show / handle tap)               │                   │
+  │   └──────────────┬──────────────────────────┘                   │
+  │                  │  route from payload                          │
+  │                  ▼                                              │
+  │            GoRouter.go(deepLink)                                │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │              QR CODE SCANNING                                   │
+  │                                                                 │
+  │   ┌─────────────────────┐                                       │
+  │   │  mobile_scanner v7  │                                       │
+  │   │  (ML Kit / Vision)  │                                       │
+  │   └──────────┬──────────┘                                       │
+  │              │                                                  │
+  │              ▼                                                  │
+  │   ┌──────────────────────┐      ┌──────────────────┐            │
+  │   │  Scan Window (ROI)   │ ───▶ │ Parse QR Payload │            │
+  │   │  [Guided Overlay]    │      │ {ticketId, code}  │           │
+  │   └──────────────────────┘      └────────┬─────────┘            │
+  │                                          │                     │
+  │                                          ▼                     │
+  │                               ┌────────────────────┐           │
+  │                               │  POST /check-in    │           │
+  │                               │  ─▶ Success ✓      │           │
+  │                               │  ─▶ Already Used ✗  │          │
+  │                               │  ─▶ Invalid ✗      │           │
+  │                               └────────────────────┘           │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ### M8: Testing (Week 17–18)
@@ -706,6 +778,70 @@ M6 — UI Architecture:
 - [ ] Run `flutter test --coverage` and verify
 
 **Exit Criteria:** 80%+ coverage on two features. All widget tests pass. Integration test passes.
+
+```
+M8 — Testing Pyramid:
+
+                          ╱╲
+                         ╱  ╲
+                        ╱ E2E╲
+                       ╱──────╲        ← 1-2 integration tests
+                      ╱ Integr.╲         (login → buy ticket → view)
+                     ╱──────────╲
+                    ╱   Widget   ╲      ← Every screen × 3 states
+                   ╱──────────────╲       (data, loading, error)
+                  ╱     Unit       ╲    ← Entities, repos, controllers
+                 ╱──────────────────╲     (mock repos via overrides)
+                ╱────────────────────╲
+
+  Test Infrastructure:
+
+  test/
+  ├── helpers/
+  │   ├── mocks.dart           ◀── @GenerateMocks([EventsRepository, ...])
+  │   ├── fakes.dart           ◀── FakeEvent(), FakeTicket()
+  │   └── test_app.dart        ◀── ProviderScope + overrides + MaterialApp
+  │
+  ├── features/
+  │   ├── events/
+  │   │   ├── data/
+  │   │   │   └── events_repo_test.dart    ← mock API, verify fallback
+  │   │   ├── domain/
+  │   │   │   └── event_entity_test.dart   ← equality, copyWith, JSON
+  │   │   ├── presentation/
+  │   │   │   ├── events_controller_test.dart ← ProviderContainer
+  │   │   │   └── events_screen_test.dart    ← pump + verify widgets
+  │   │   └── drift/
+  │   │       └── events_dao_test.dart     ← in-memory DB
+  │   └── tickets/
+  │       └── ...  (mirror events)
+  │
+  └── integration/
+      └── purchase_flow_test.dart          ← full login → purchase → view
+
+  Test Pattern per Layer:
+  ┌───────────────────────────────────────────────────────────────┐
+  │  UNIT (Repository)                                           │
+  │  ┌──────────────┐   mock success   ┌─────────────────┐       │
+  │  │ MockApiService│ ───────────────▶ │ verify entities │       │
+  │  │              │   mock failure   │ verify fallback │       │
+  │  └──────────────┘ ───────────────▶ │ to cached data  │       │
+  │                                    └─────────────────┘       │
+  ├───────────────────────────────────────────────────────────────┤
+  │  CONTROLLER (AsyncNotifier)                                  │
+  │  ┌──────────────────────┐   ┌──────────────────────────┐     │
+  │  │ ProviderContainer     │   │ verify AsyncValue states │     │
+  │  │ + repository override │──▶│ loading → data / error   │     │
+  │  └──────────────────────┘   └──────────────────────────┘     │
+  ├───────────────────────────────────────────────────────────────┤
+  │  WIDGET (Screen)                                             │
+  │  ┌─────────────┐    ┌──────────────────────────────────┐     │
+  │  │ testApp()    │    │ pumpWidget → find text/buttons   │     │
+  │  │ wrapper with │───▶│ verify loading spinner shown     │     │
+  │  │ mock provider│    │ verify error message displayed   │     │
+  │  └─────────────┘    └──────────────────────────────────┘     │
+  └───────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -728,11 +864,95 @@ M6 — UI Architecture:
 
 **Exit Criteria:** CI green on every push. Beta distributed to testers. OTA patch delivered successfully.
 
+```
+M9 — CI/CD Pipeline & Performance Budgets:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                GitHub Actions Workflow                          │
+  │                                                                 │
+  │   git push ───▶ ┌─────────┐   ┌──────────┐   ┌─────────────┐  │
+  │                 │ Analyze │──▶│   Test   │──▶│    Build    │  │
+  │                 │ dart    │   │ flutter  │   │ APK / IPA   │  │
+  │                 │ analyze │   │ test     │   │             │  │
+  │                 └─────────┘   └──────────┘   └──────┬──────┘  │
+  │                                                      │         │
+  │                               ┌──────────────────────┘         │
+  │                               ▼                                │
+  │                 ┌───────────────────────────┐                   │
+  │                 │   Fastlane Distribution    │                  │
+  │                 │                           │                   │
+  │                 │  Android ──▶ Firebase AD   │                  │
+  │                 │  iOS ──────▶ Firebase AD   │                  │
+  │                 │   (Match certificates)     │                  │
+  │                 └──────────────┬────────────┘                   │
+  │                                │                               │
+  │                                ▼                               │
+  │                 ┌───────────────────────────┐                   │
+  │                 │   Shorebird OTA Patch     │                   │
+  │                 │                           │                   │
+  │                 │  shorebird release ──▶ v1  │                  │
+  │                 │  fix bug ──▶ shorebird     │                  │
+  │                 │        patch android       │                  │
+  │                 │  users get patch silently  │                  │
+  │                 └───────────────────────────┘                   │
+  └─────────────────────────────────────────────────────────────────┘
+
+  Cache Strategy (speeds up CI by ~60%):
+  ┌────────────────────────────────────────────────────┐
+  │  Cache Key Format: runner.os + hashFiles(lock)     │
+  │                                                    │
+  │  ┌────────────┐  ┌────────────┐  ┌──────────────┐  │
+  │  │ Pub Cache  │  │  Gradle    │  │  CocoaPods   │  │
+  │  │ ~/.pub-cach│  │ ~/.gradle/ │  │ ~/Library/   │  │
+  │  │ pubspec.lo │  │ build.grad │  │ Caches/Cocoa │  │
+  │  └────────────┘  └────────────┘  └──────────────┘  │
+  └────────────────────────────────────────────────────┘
+
+  Performance Budgets:
+  ┌─────────────────────────────────────────────────┐
+  │  Metric             │  Budget    │  Tool        │
+  │─────────────────────┼────────────┼──────────────│
+  │  Frame render       │  < 16ms    │  DevTools    │
+  │  Cold start         │  < 3s      │  Stopwatch   │
+  │  APK size           │  < 25MB    │  --analyze   │
+  │  Widget rebuilds    │  minimal   │  select()    │
+  │  List scrolling     │  60fps     │  builder+ext │
+  │  Image loading      │  cached    │  CachedImg   │
+  │  SVG rendering      │  precomp   │  .vec files  │
+  └─────────────────────────────────────────────────┘
+```
+
 ---
 
 ## Spec-First Workflow
 
 For every feature, follow this sequence **before writing any code**:
+
+```
+Spec-First Workflow — Visual Pipeline:
+
+  ┌─────┐    ┌─────────┐    ┌──────────┐    ┌───────────┐
+  │STEP │    │  STEP   │    │  STEP    │    │  STEP     │
+  │  1  │───▶│    2    │───▶│    3     │───▶│    4      │
+  │SPEC │    │CONTRACT │    │ENTITIES  │    │  TESTS    │
+  │     │    │         │    │ & DTOs   │    │  FIRST    │
+  └─────┘    └─────────┘    └──────────┘    └─────┬─────┘
+                                                   │
+       ┌───────────────────────────────────────────┘
+       │
+       ▼
+  ┌──────────┐    ┌───────────┐    ┌──────────────┐
+  │  STEP    │    │  STEP     │    │    STEP      │
+  │    5     │───▶│    6      │───▶│      7       │
+  │IMPLEMENT │    │WIRE &     │    │  REVIEW      │
+  │(inside→out)   │VERIFY     │    │  CHECKLIST   │
+  └──────────┘    └───────────┘    └──────────────┘
+
+  Time Flow:
+  ─────────────────────────────────────────────────▶
+  THINK          DEFINE         BUILD       VERIFY
+  (spec+contract) (entities+tests) (impl)   (wire+review)
+```
 
 ### Step 1: Spec (Document)
 
@@ -744,6 +964,42 @@ docs/specs/<feature>-spec.md
 ├── API contract (request/response shapes)
 ├── Screen wireframes (ASCII or Figma link)
 └── Edge cases & error states
+
+  Example:
+  ┌──────────────────────────────────────────────────────┐
+  │  docs/specs/events-spec.md                           │
+  │                                                      │
+  │  ## Problem                                          │
+  │  Users need to discover and browse upcoming events.  │
+  │                                                      │
+  │  ## User Story                                       │
+  │  As a user, I want to see a list of events           │
+  │  so that I can find ones I'm interested in.          │
+  │                                                      │
+  │  ## Acceptance Criteria                              │
+  │  Given I am on the Events screen                     │
+  │  When events load successfully                       │
+  │  Then I see a scrollable list with title, date, loc  │
+  │                                                      │
+  │  ## API Contract                                     │
+  │  GET /api/events → { data: Event[], total: int }     │
+  │                                                      │
+  │  ## Wireframe                                        │
+  │  ┌─────────────────────┐                             │
+  │  │ ◀  Events           │                             │
+  │  │─────────────────────│                             │
+  │  │ 🔍 Search...        │                             │
+  │  │─────────────────────│                             │
+  │  │ ┌─────────────────┐ │                             │
+  │  │ │ Flutter Conf '25│ │                             │
+  │  │ │ Jun 15 • Cairo  │ │                             │
+  │  │ └─────────────────┘ │                             │
+  │  │ ┌─────────────────┐ │                             │
+  │  │ │ Dart Meetup     │ │                             │
+  │  │ │ Jun 22 • Alex   │ │                             │
+  │  │ └─────────────────┘ │                             │
+  │  └─────────────────────┘                             │
+  └──────────────────────────────────────────────────────┘
 ```
 
 ### Step 2: Contract (Interfaces)
@@ -755,6 +1011,18 @@ abstract class FeatureRepository {
   Future<Entity> getById(String id);
   Future<void> create(CreateRequest request);
 }
+
+// Dependency direction:
+//
+//   ┌──────────────┐        ┌──────────────────┐
+//   │ Presentation │ ─uses─▶│ Domain           │
+//   │ (Controller) │        │ (Abstract Repo)  │
+//   └──────────────┘        └────────▲─────────┘
+//                                    │ implements
+//                           ┌────────┴─────────┐
+//                           │ Data             │
+//                           │ (RepoImpl+API)   │
+//                           └──────────────────┘
 ```
 
 ### Step 3: Entities & DTOs
@@ -762,6 +1030,13 @@ abstract class FeatureRepository {
 ```dart
 // domain/entities/entity.dart     → Freezed, no JSON
 // data/models/entity_dto.dart     → Freezed + JSON, toEntity()
+
+// Conversion flow:
+//
+//   API JSON ──fromJson──▶ EventDto ──toEntity()──▶ Event (domain)
+//                               │
+//                               ▼
+//                          EventsCompanion ──▶ Drift DB (local cache)
 ```
 
 ### Step 4: Tests First
@@ -769,6 +1044,15 @@ abstract class FeatureRepository {
 ```dart
 // Write failing tests for repository, controller, and screen
 // They define expected behavior before implementation exists
+
+// Red → Green → Refactor:
+//
+//   ┌─────────┐     ┌─────────┐     ┌───────────┐
+//   │  RED    │────▶│  GREEN  │────▶│ REFACTOR  │
+//   │ Write   │     │ Make it │     │ Clean up  │
+//   │ failing │     │ pass    │     │ keep green│
+//   │ test    │     │         │     │           │
+//   └─────────┘     └─────────┘     └───────────┘
 ```
 
 ### Step 5: Implementation (Inside-Out)
@@ -777,6 +1061,32 @@ abstract class FeatureRepository {
 1. Data layer: API service (Retrofit) → DAO (Drift) → Repository impl
 2. State layer: Controller (AsyncNotifier)
 3. UI layer: Screen (ConsumerWidget)
+
+  Build Direction (inside → out):
+
+  ┌──────────────────────────────────────────────────────────┐
+  │                                                          │
+  │                    ③ UI Layer                             │
+  │           ┌──────────────────────────┐                   │
+  │           │  ConsumerWidget Screen   │                   │
+  │           │  ref.watch(controller)   │                   │
+  │           └────────────┬─────────────┘                   │
+  │                        │ watches                         │
+  │                        ▼                                 │
+  │                 ② State Layer                            │
+  │           ┌──────────────────────────┐                   │
+  │           │  AsyncNotifier           │                   │
+  │           │  AsyncValue.guard(...)   │                   │
+  │           └────────────┬─────────────┘                   │
+  │                        │ calls                           │
+  │                        ▼                                 │
+  │              ① Data Layer  (BUILD FIRST)                 │
+  │   ┌──────────────┬───────────────┬───────────────┐       │
+  │   │ Retrofit API │   Drift DAO   │  Repository   │       │
+  │   │ (network)    │   (cache)     │  (orchestrate)│       │
+  │   └──────────────┴───────────────┴───────────────┘       │
+  │                                                          │
+  └──────────────────────────────────────────────────────────┘
 ```
 
 ### Step 6: Wire & Verify
@@ -788,21 +1098,48 @@ abstract class FeatureRepository {
 4. Run tests
 5. Manual smoke test
 6. Check coverage: flutter test --coverage
+
+  Wiring Checklist Flow:
+
+  providers.dart ──▶ routes.dart ──▶ build_runner ──▶ tests
+       │                 │                │              │
+       ▼                 ▼                ▼              ▼
+  Export repo +     Add GoRoute      Generate .g.dart   All pass?
+  controller         + screen        + .freezed.dart       │
+  providers           path                              ┌──┴──┐
+                                                        │ YES │ → smoke test ✓
+                                                        │ NO  │ → fix & rerun
+                                                        └─────┘
 ```
 
 ### Step 7: Review Checklist
 
 ```
-□ No hardcoded strings (all through t.key)
-□ No hardcoded colors (all through colorScheme/appColors)
-□ No direct Dio usage in presentation/domain
-□ Repository exposed as abstract type
-□ Controller uses AsyncValue.guard()
-□ Error states handled in .when()
-□ const constructors where possible
-□ select() used for expensive watches
-□ Tests cover success, error, loading, and edge cases
-□ New strings added to all locale YAML files
+  ┌─────────────────────────────────────────────────────────────┐
+  │                    REVIEW CHECKLIST                         │
+  │                                                             │
+  │  ── i18n ──────────────────────────────────────────────     │
+  │  □ No hardcoded strings (all through t.key)                 │
+  │  □ New strings added to all locale YAML files               │
+  │                                                             │
+  │  ── Theming ───────────────────────────────────────────     │
+  │  □ No hardcoded colors (all through colorScheme/appColors)  │
+  │                                                             │
+  │  ── Architecture ──────────────────────────────────────     │
+  │  □ No direct Dio usage in presentation/domain               │
+  │  □ Repository exposed as abstract type                      │
+  │  □ Controller uses AsyncValue.guard()                       │
+  │  □ Error states handled in .when()                          │
+  │                                                             │
+  │  ── Performance ───────────────────────────────────────     │
+  │  □ const constructors where possible                        │
+  │  □ select() used for expensive watches                      │
+  │                                                             │
+  │  ── Testing ───────────────────────────────────────────     │
+  │  □ Tests cover success, error, loading, and edge cases      │
+  │                                                             │
+  │  ALL CHECKED? ───▶ ✅ MERGE-READY                          │
+  └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
