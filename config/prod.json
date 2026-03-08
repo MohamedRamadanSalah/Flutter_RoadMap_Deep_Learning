@@ -1,0 +1,5 @@
+{
+  "API_BASE_URL": "https://api.eventhub.com",
+  "isTicketSalesEnabled": false,
+  "maxUploadSizeBytes": 5242880
+}

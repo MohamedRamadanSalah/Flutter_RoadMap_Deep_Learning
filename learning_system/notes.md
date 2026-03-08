@@ -275,6 +275,117 @@ flowchart LR
 
 ---
 
+## Environment Management in Flutter (flutter_dotenv)
+
+### Overview
+
+Managing multiple environments (dev, staging, prod) is essential for scalable Flutter apps. The flutter_dotenv package allows you to load environment variables from .env files at runtime, enabling easy switching and secure configuration.
+
+### Visual Diagram: Environment Loading Pipeline
+
+```mermaid
+graph TD
+    A[App Startup] --> B[Load .env file]
+    B --> C[flutter_dotenv parses variables]
+    C --> D[Inject into app config/providers]
+    D --> E[Feature modules use env values]
+    style B fill:#e3f2fd,stroke:#2196f3
+    style C fill:#fffde7,stroke:#ffeb3b
+    style D fill:#e8f5e9,stroke:#43a047
+    style E fill:#f3e5f5,stroke:#8e24aa
+```
+
+---
+
+### Step-by-Step Example
+
+#### 1. Create .env Files
+
+- `.env.dev`:
+  ```env
+  API_BASE_URL=https://api-dev.eventhub.com
+  IS_TICKET_SALES_ENABLED=true
+  MAX_UPLOAD_SIZE_BYTES=10485760
+  ```
+- `.env.staging`:
+  ```env
+  API_BASE_URL=https://api-staging.eventhub.com
+  IS_TICKET_SALES_ENABLED=true
+  MAX_UPLOAD_SIZE_BYTES=10485760
+  ```
+- `.env.prod`:
+  ```env
+  API_BASE_URL=https://api.eventhub.com
+  IS_TICKET_SALES_ENABLED=false
+  MAX_UPLOAD_SIZE_BYTES=5242880
+  ```
+
+#### 2. Add flutter_dotenv Dependency
+
+```yaml
+# pubspec.yaml
+# ...existing code...
+flutter_dotenv: ^5.1.0
+# ...existing code...
+```
+
+#### 3. Load Environment in main.dart
+
+```dart
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+void main() async {
+  await dotenv.load(fileName: ".env.dev"); // Change to .env.staging or .env.prod as needed
+  runApp(MyApp());
+}
+```
+
+#### 4. Access Variables Anywhere
+
+```dart
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+final apiBaseUrl = dotenv.env['API_BASE_URL'];
+final isTicketSalesEnabled = dotenv.env['IS_TICKET_SALES_ENABLED'] == 'true';
+final maxUploadSize = int.parse(dotenv.env['MAX_UPLOAD_SIZE_BYTES'] ?? '5242880');
+```
+
+---
+
+### Best Practices
+
+- Never commit production secrets to version control.
+- Use .env files for API endpoints, feature flags, and limits.
+- Switch environment files using build scripts or CI/CD.
+- Validate required keys at startup.
+
+---
+
+### Checklist
+
+- [x] .env files created for each environment
+- [x] flutter_dotenv added to pubspec.yaml
+- [x] main.dart loads correct .env file
+- [x] Providers/services use env variables
+
+---
+
+### Common Mistakes
+
+- Forgetting to load the .env file before runApp()
+- Using incorrect file names (case-sensitive)
+- Not parsing string values to bool/int
+
+---
+
+### Advanced: CI/CD Integration
+
+- Use build scripts to select .env file per build:
+  - `flutter build apk --dart-define=ENV=prod`
+  - In main.dart, load file based on ENV
+
+---
+
 ## Summary
 
 - **DTOs** are for data transfer and serialization.

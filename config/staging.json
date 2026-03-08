@@ -1,0 +1,5 @@
+{
+  "API_BASE_URL": "https://api-staging.eventhub.com",
+  "isTicketSalesEnabled": true,
+  "maxUploadSizeBytes": 10485760
+}
