@@ -312,7 +312,7 @@ Milestone Timeline:
 - [x] Create DTOs with `@JsonSerializable` and `toEntity()` methods
 - [ ] Set up barrel files for each feature
 - [ ] Configure environment JSON files (`dev.json`, `staging.json`, `prod.json`)
-- [ ] Run `build_runner` — all generators pass
+- [X] Run `build_runner` — all generators pass
 - [ ] Verify project compiles with `flutter analyze`
 
 **Exit Criteria:** Project scaffold matches `project-structure.md` conventions. All entities and DTOs generate correctly.

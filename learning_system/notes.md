@@ -163,6 +163,118 @@ class EventDto with _$EventDto {
 
 ---
 
+## Barrel Files — Deep Dive
+
+### What is a Barrel File?
+
+A barrel file is a Dart file that exports all public APIs for a feature. It acts as the single entry point for importing feature code elsewhere.
+
+### Why Use Barrel Files?
+
+- Simplifies imports: `import 'features/events/events.dart';` instead of many individual files
+- Enforces modularity: Only public APIs are exposed
+- Makes refactoring easier: Change internal structure without breaking consumers
+- Prevents leaking internal details: Only export what should be public
+
+### Real-World Example
+
+```dart
+// features/events/events.dart
+export 'domain/entities/event.dart';
+export 'data/models/event_dto.dart';
+export 'providers.dart';
+export 'presentation/screens/event_list_screen.dart';
+export 'presentation/controllers/event_list_controller.dart';
+```
+
+### Best Practices
+
+- Only export files that are part of the public API
+- Do not export internal helpers or private files
+- Use one barrel file per feature
+- Keep barrel files updated as features evolve
+
+### Common Mistakes
+
+- Exporting everything (including private/internal files)
+- Not using barrel files, leading to messy imports
+- Forgetting to update barrel files after refactoring
+- Using barrel files for unrelated features (breaks modularity)
+
+### Performance & Maintainability
+
+- Barrel files do not impact runtime performance, but greatly improve code maintainability and readability
+- They make onboarding new developers easier
+
+---
+
+## Barrel Files — Visual Explanation & Example
+
+### Mermaid Diagram: Feature Barrel File Structure
+
+```mermaid
+flowchart TD
+    subgraph EventsFeature[Events Feature]
+        Entity[Event Entity]:::entity
+        DTO[Event DTO]:::dto
+        Providers[Providers]:::api
+        Controller[EventListController]:::api
+        Screen[EventListScreen]:::ui
+    end
+    Barrel[events.dart Barrel File]:::barrel
+    Barrel --> Entity
+    Barrel --> DTO
+    Barrel --> Providers
+    Barrel --> Controller
+    Barrel --> Screen
+    AppRoot[App Root]:::app
+    AppRoot --> Barrel
+
+    classDef entity fill:#99ff99,stroke:#333
+    classDef dto fill:#99ccff,stroke:#333
+    classDef api fill:#ffcc99,stroke:#333
+    classDef ui fill:#d5a6ff,stroke:#333
+    classDef barrel fill:#b3e6ff,stroke:#333,stroke-width:2px
+    classDef app fill:#e6b3ff,stroke:#333
+```
+
+---
+
+### Example: Barrel File for Tickets Feature
+
+```dart
+// lib/features/tickets/tickets.dart
+
+export 'domain/entities/ticket.dart';
+export 'data/models/ticket_dto.dart';
+export 'providers.dart';
+export 'presentation/screens/ticket_list_screen.dart';
+export 'presentation/controllers/ticket_list_controller.dart';
+```
+
+---
+
+### How Barrel Files Simplify Imports
+
+```mermaid
+flowchart LR
+    TicketsBarrel[tickets.dart Barrel File]:::barrel --> TicketEntity[Ticket Entity]:::entity
+    TicketsBarrel --> TicketDTO[Ticket DTO]:::dto
+    TicketsBarrel --> TicketProviders[Providers]:::api
+    TicketsBarrel --> TicketController[TicketListController]:::api
+    TicketsBarrel --> TicketScreen[TicketListScreen]:::ui
+    FeatureConsumer[Other Feature or App Root]:::app --> TicketsBarrel
+
+    classDef entity fill:#99ff99,stroke:#333
+    classDef dto fill:#99ccff,stroke:#333
+    classDef api fill:#ffcc99,stroke:#333
+    classDef ui fill:#d5a6ff,stroke:#333
+    classDef barrel fill:#b3e6ff,stroke:#333,stroke-width:2px
+    classDef app fill:#e6b3ff,stroke:#333
+```
+
+---
+
 ## Summary
 
 - **DTOs** are for data transfer and serialization.
