@@ -12,14 +12,14 @@ Each phase builds on the previous one. Complete all concepts in a phase before m
 
 ```mermaid
 graph TD
-  P1[Phase 1: Foundation\nWeek 1-2] --> P2[Phase 2: State\nWeek 3-4]
-  P2 --> P3[Phase 3: Networking\nWeek 5-7]
-  P3 --> P4[Phase 4: Authentication\nWeek 8]
-  P4 --> P5[Phase 5: UI Polish\nWeek 9-10]
-  P5 --> P6[Phase 6: Platform\nWeek 11-12]
-  P6 --> P7[Phase 7: Testing\nWeek 13-14]
-  P7 --> P8[Phase 8: Performance & CI/CD\nWeek 15-16]
-  P8 --> PROD[PRODUCTION READY]
+  P1[Phase 1: Foundation] --> P2[Phase 2: State]
+  P2 --> P3[Phase 3: Networking]
+  P3 --> P4[Phase 4: Authentication]
+  P4 --> P5[Phase 5: UI Polish]
+  P5 --> P6[Phase 6: Platform]
+  P6 --> P7[Phase 7: Testing]
+  P7 --> P8[Phase 8: Performance & CI/CD]
+  P8 --> PROD[Production Ready]
   style P1 fill:#e3f2fd,stroke:#2196f3
   style P2 fill:#fffde7,stroke:#ffeb3b
   style P3 fill:#e8f5e9,stroke:#43a047
@@ -37,11 +37,11 @@ graph TD
 
 ```mermaid
 graph LR
-  J[JUNIOR\nPhase 1-2] --> M[MID\nPhase 3-4]
-  M --> S[SENIOR\nPhase 5-8]
-  J --> F[Freezed\nbuild_runner\nRiverpod basics\nProject structure\nJSON serialization]
-  M --> D[Dio + Retrofit\nError pipeline\nAuth lifecycle\nDrift + DAOs\nGraphQL\nToken refresh]
-  S --> T[M3 Theming\nDeep links\nPush notifications\nCI/CD pipeline\n80% test coverage\nPerformance tuning]
+  J[JUNIOR Phase 1-2] --> M[MID Phase 3-4]
+  M --> S[SENIOR Phase 5-8]
+  J --> F[Freezed, build_runner, Riverpod basics, Project structure, JSON serialization]
+  M --> D[Dio + Retrofit, Error pipeline, Auth lifecycle, Drift + DAOs, GraphQL, Token refresh]
+  S --> T[M3 Theming, Deep links, Push notifications, CI/CD pipeline, 80% test coverage, Performance tuning]
   style J fill:#e3f2fd,stroke:#2196f3
   style M fill:#fffde7,stroke:#ffeb3b
   style S fill:#e8f5e9,stroke:#43a047
@@ -71,26 +71,26 @@ graph LR
 - Run `build_runner` successfully with all generators
 
 ```mermaid
-graph LR
-  A[@freezed] --> B[build_runner]
-  B --> C[.freezed.dart]
-  A --> D[@JsonSerializable]
-  D --> B
-  A --> E[@riverpod]
-  E --> B
-  B --> F[.g.dart]
-  B --> G[.g.dart]
-  C --> H[Your code compiles]
-  F --> H
-  G --> H
-  style A fill:#99ccff,stroke:#333
-  style B fill:#ffe0b2,stroke:#fb8c00
-  style C fill:#b2dfdb,stroke:#00897b
-  style D fill:#e3f2fd,stroke:#2196f3
-  style E fill:#f3e5f5,stroke:#8e24aa
-  style F fill:#c8e6c9,stroke:#388e3c
-  style G fill:#d1c4e9,stroke:#7e57c2
-  style H fill:#ffd600,stroke:#ff6f00,stroke-width:2px
+flowchart LR
+  Freezed[Freezed] --> BuildRunner[build_runner]
+  BuildRunner --> FreezedDart[freezed.dart]
+  Freezed --> JsonSerializable[JsonSerializable]
+  JsonSerializable --> BuildRunner
+  Freezed --> Riverpod[Riverpod]
+  Riverpod --> BuildRunner
+  BuildRunner --> GDot[g.dart]
+  BuildRunner --> GDot2[g.dart]
+  FreezedDart --> Compiles[Code compiles]
+  GDot --> Compiles
+  GDot2 --> Compiles
+  style Freezed fill:#99ccff,stroke:#333
+  style BuildRunner fill:#ffe0b2,stroke:#fb8c00
+  style FreezedDart fill:#b2dfdb,stroke:#00897b
+  style JsonSerializable fill:#e3f2fd,stroke:#2196f3
+  style Riverpod fill:#f3e5f5,stroke:#8e24aa
+  style GDot fill:#c8e6c9,stroke:#388e3c
+  style GDot2 fill:#d1c4e9,stroke:#7e57c2
+  style Compiles fill:#ffd600,stroke:#ff6f00,stroke-width:2px
 ```
 
 ---
@@ -119,20 +119,20 @@ Phase 2 — Riverpod Provider Graph:
 
 ```mermaid
 flowchart TD
-  Widget[Widget Tree] --> CP[controllerProvider]
-  CP --> OLCP[orderListControllerProvider\n(AsyncNotifier)]
-  OLCP --> RP[repositoryProvider]
-  RP --> AP[apiProvider]
-  RP --> DP[daoProvider]
-  AP --> Dio[Dio]
-  DP --> SQLite[SQLite]
-  OLCP --> UI[UI]
-  style Widget fill:#e3f2fd,stroke:#2196f3
-  style CP fill:#fffde7,stroke:#ffeb3b
-  style OLCP fill:#e8f5e9,stroke:#43a047
-  style RP fill:#f3e5f5,stroke:#8e24aa
-  style AP fill:#b2dfdb,stroke:#00897b
-  style DP fill:#ffe0b2,stroke:#fb8c00
+  WidgetTree --> ControllerProvider
+  ControllerProvider --> OrderListControllerProvider
+  OrderListControllerProvider --> RepositoryProvider
+  RepositoryProvider --> ApiProvider
+  RepositoryProvider --> DaoProvider
+  ApiProvider --> Dio
+  DaoProvider --> SQLite
+  OrderListControllerProvider --> UI
+  style WidgetTree fill:#e3f2fd,stroke:#2196f3
+  style ControllerProvider fill:#fffde7,stroke:#ffeb3b
+  style OrderListControllerProvider fill:#e8f5e9,stroke:#43a047
+  style RepositoryProvider fill:#f3e5f5,stroke:#8e24aa
+  style ApiProvider fill:#b2dfdb,stroke:#00897b
+  style DaoProvider fill:#ffe0b2,stroke:#fb8c00
   style Dio fill:#c8e6c9,stroke:#388e3c
   style SQLite fill:#d1c4e9,stroke:#7e57c2
   style UI fill:#ffd600,stroke:#ff6f00,stroke-width:2px
@@ -169,22 +169,22 @@ select() → watch only a subset (minimize rebuilds)
 - Repository implementation with cache fallback on network error
 
 ```
-
+```
 Phase 3 — The Data Pipeline:
 
 ```mermaid
 flowchart TD
-  Server[Server (REST + GraphQL)] --> DioClient[Dio Client]
-  DioClient --> ErrorInterceptor[Error Interceptor]
-  ErrorInterceptor --> AuthInterceptor[Auth Interceptor]
-  AuthInterceptor --> LogInterceptor[Log Interceptor]
-  LogInterceptor --> AppException[AppException (sealed)]
-  AppException --> Repository[Repository (data layer)]
-  Repository --> Controller[Controller (AsyncValue)]
-  Controller --> Data[data]
-  Controller --> Loading[loading]
-  Controller --> Error[error]
-  Repository --> Drift[Drift (offline fallback)]
+  Server --> DioClient
+  DioClient --> ErrorInterceptor
+  ErrorInterceptor --> AuthInterceptor
+  AuthInterceptor --> LogInterceptor
+  LogInterceptor --> AppException
+  AppException --> Repository
+  Repository --> Controller
+  Controller --> Data
+  Controller --> Loading
+  Controller --> Error
+  Repository --> Drift
   style Server fill:#e3f2fd,stroke:#2196f3
   style DioClient fill:#fffde7,stroke:#ffeb3b
   style ErrorInterceptor fill:#e8f5e9,stroke:#43a047
@@ -220,27 +220,28 @@ flowchart TD
 
 ````
 
+````
 Phase 4 — Auth Lifecycle:
 
 ```mermaid
 flowchart TD
-  User[User opens app] --> GoRouter[GoRouter Auth Guard]
-  GoRouter --> AuthController[AuthController (Riverpod)]
-  AuthController --> Unauth[Unauthenticated]
-  Unauth --> Login[login()]
-  Login --> Loading[Loading]
-  Loading --> Authenticated[Authenticated {user, access, refresh}]
-  Authenticated --> TokenRefresh[Token Refresh Flow (401)]
-  TokenRefresh --> QueuedInterceptor[QueuedInterceptor _tryRefresh()]
-  QueuedInterceptor --> Success[Success]
-  QueuedInterceptor --> Failure[Failure]
-  Success --> Retry[Retry original request]
-  Failure --> Logout[logout()]
-  Logout --> Redirect[redirect to login]
-  style User fill:#e3f2fd,stroke:#2196f3
-  style GoRouter fill:#fffde7,stroke:#ffeb3b
+  UserApp[User opens app] --> GoRouterGuard[GoRouter Auth Guard]
+  GoRouterGuard --> AuthController
+  AuthController --> Unauthenticated
+  Unauthenticated --> Login
+  Login --> Loading
+  Loading --> Authenticated
+  Authenticated --> TokenRefresh
+  TokenRefresh --> QueuedInterceptor
+  QueuedInterceptor --> Success
+  QueuedInterceptor --> Failure
+  Success --> RetryRequest
+  Failure --> Logout
+  Logout --> RedirectLogin
+  style UserApp fill:#e3f2fd,stroke:#2196f3
+  style GoRouterGuard fill:#fffde7,stroke:#ffeb3b
   style AuthController fill:#e8f5e9,stroke:#43a047
-  style Unauth fill:#f3e5f5,stroke:#8e24aa
+  style Unauthenticated fill:#f3e5f5,stroke:#8e24aa
   style Login fill:#b2dfdb,stroke:#00897b
   style Loading fill:#ffe0b2,stroke:#fb8c00
   style Authenticated fill:#c8e6c9,stroke:#388e3c
@@ -248,9 +249,9 @@ flowchart TD
   style QueuedInterceptor fill:#ffd600,stroke:#ff6f00,stroke-width:2px
   style Success fill:#99ff99,stroke:#333
   style Failure fill:#ff5252,stroke:#333
-  style Retry fill:#b3e6ff,stroke:#333
+  style RetryRequest fill:#b3e6ff,stroke:#333
   style Logout fill:#ffeb3b,stroke:#333
-  style Redirect fill:#ff6f00,stroke:#333
+  style RedirectLogin fill:#ff6f00,stroke:#333
 ```
 
 ---
@@ -277,22 +278,23 @@ flowchart TD
 - Two locales with full coverage
 
 ````
+
 Phase 5 — Theming & Responsive Architecture:
 
 ```mermaid
 graph TD
-  Seed[Seed Color (#AB2138)] --> ColorScheme[ColorScheme.fromSeed()]
-  ColorScheme --> Primary[primary, onPrimary, primaryContainer]
-  ColorScheme --> Secondary[secondary, tertiary]
-  ColorScheme --> Surface[surface, onSurface, surfaceContainer]
-  ColorScheme --> Error[error, onError]
-  ColorScheme --> Brand[Brand overrides from Figma]
-  Brand --> ThemeExt[ThemeExtension<AppColors>]
-  ThemeExt --> Success[success]
-  ThemeExt --> Warning[warning]
-  ThemeExt --> Info[info]
-  Success --> Light[LIGHT]
-  Success --> Dark[DARK]
+  Seed[Seed Color] --> ColorScheme[ColorScheme fromSeed]
+  ColorScheme --> Primary[Primary Colors]
+  ColorScheme --> Secondary[Secondary Colors]
+  ColorScheme --> Surface[Surface Colors]
+  ColorScheme --> Error[Error Colors]
+  ColorScheme --> Brand[Brand overrides]
+  Brand --> ThemeExt[ThemeExtension AppColors]
+  ThemeExt --> Success[Success]
+  ThemeExt --> Warning[Warning]
+  ThemeExt --> Info[Info]
+  Success --> Light[Light]
+  Success --> Dark[Dark]
   Warning --> Light
   Warning --> Dark
   Info --> Light
@@ -330,21 +332,21 @@ graph TD
 - Push notification received in foreground, tapped → navigated to correct screen
 - QR scan → process result → navigate
 
-```
+````
 Phase 6 — Platform Integration Map:
 
 ```mermaid
 flowchart TD
-  DL[Deep Links] --> UserTap[User taps shared URL]
+  DL[Deep Links] --> UserTap[User taps URL]
   Push[Push Notifications] --> FCM[FCM delivers notification]
   QR[QR Scanner] --> Camera[Camera detects QR barcode]
-  UserTap --> OSVerify[OS verifies domain: assetlinks/apple-app-site-assoc.]
-  FCM --> AppState[App State?]
-  Camera --> Extract[Extract value\nStop scanning]
+  UserTap --> OSVerify[OS verifies domain]
+  FCM --> AppState[App State]
+  Camera --> Extract[Extract value]
   OSVerify --> GoRouter[GoRouter route matching]
-  AppState --> Foreground[Foreground: show local]
-  AppState --> Background[Background: system tray]
-  AppState --> Terminated[Terminated: getInitial]
+  AppState --> Foreground[Foreground]
+  AppState --> Background[Background]
+  AppState --> Terminated[Terminated]
   GoRouter --> EventDetail[EventDetailScreen]
   GoRouter --> TicketDetail[TicketDetailScreen]
   style DL fill:#e3f2fd,stroke:#2196f3
@@ -385,21 +387,22 @@ flowchart TD
 - Widget test for every screen
 - One end-to-end integration test
 
-```
+````
+
 Phase 7 — Testing Pyramid:
 
 ```mermaid
 flowchart TD
   E2E[E2E Integration Test] --> Widget[Widget Tests]
   Widget --> Unit[Unit Tests]
-  Unit --> Coverage[80%+ line coverage]
+  Unit --> Coverage[Coverage]
   E2E --> Coverage
   Widget --> Coverage
   Unit --> Coverage
   E2E --> Toolkit[Test Tool Kit]
   Widget --> Toolkit
   Unit --> Toolkit
-  Toolkit --> Mocktail[mocktail]
+  Toolkit --> Mocktail[Mocktail]
   Toolkit --> ProviderScope[ProviderScope overrides]
   Toolkit --> Drift[Drift in-memory DB]
   style E2E fill:#e3f2fd,stroke:#2196f3
@@ -434,79 +437,65 @@ flowchart TD
 - CI pipeline passing on every push
 - Beta distributed via Firebase App Distribution
 
-```
+````
 Phase 8 — CI/CD Pipeline:
 
-   Developer pushes code
-          │
-          ▼
-  ┌───────────────────────────────────────────────────────┐
-  │              GitHub Actions CI                          │
-  │                                                         │
-  │  ┌──────────┐   ┌──────────┐   ┌────────────────────┐ │
-  │  │  dart     │──▶│ flutter  │──▶│   flutter build    │ │
-  │  │  format   │   │  test    │   │   apk --release    │ │
-  │  │  --check  │   │ --cover  │   │   ios --no-codesign│ │
-  │  └──────────┘   └──────────┘   └─────────┬──────────┘ │
-  │                                           │            │
-  └───────────────────────────────────────────┼────────────┘
-                                              │
-                       ┌──────────────────────┼───────────────┐
-                       │                      │               │
-                       ▼                      ▼               ▼
-               ┌──────────────┐     ┌──────────────┐  ┌────────────┐
-               │   Fastlane   │     │   Fastlane   │  │  Shorebird │
-               │   Android    │     │     iOS      │  │  OTA Patch │
-               │              │     │              │  │            │
-               │ Firebase App │     │  Match certs │  │ Dart-only  │
-               │ Distribution │     │  App Store / │  │ patches    │
-               │              │     │  Firebase    │  │ skip store │
-               └──────────────┘     └──────────────┘  └────────────┘
-                       │                    │                │
-                       └────────────┬───────┘                │
-                                    ▼                        ▼
-                            ┌──────────────┐        ┌──────────────┐
-                            │   Testers    │        │  Production  │
-                            │  get beta    │        │  users get   │
-                            │  instantly   │        │  hot patch   │
-                            └──────────────┘        └──────────────┘
-
-  Performance Budgets:
-  ┌────────────────┬───────────────────────────────────┐
-  │ Frame time     │  < 16ms  ████████░░  (60fps)      │
-  │ Cold start     │  < 3s    ███░░░░░░░               │
-  │ APK size       │  < 30MB  ██████░░░░               │
-  │ Memory         │  < 200MB █████████░               │
-  │ Crash-free     │  99.5%   ██████████               │
-  └────────────────┴───────────────────────────────────┘
+```mermaid
+flowchart TD
+  Dev[Developer pushes code] --> CI[GitHub Actions CI]
+  CI --> Dart[Dart format check]
+  CI --> Test[Flutter test cover]
+  CI --> Build[Flutter build apk release]
+  CI --> BuildIOS[Flutter build ios no-codesign]
+  Build --> FastlaneAndroid[Fastlane Android Firebase App Distribution]
+  BuildIOS --> FastlaneIOS[Fastlane iOS Match certs App Store Firebase]
+  CI --> Shorebird[Shorebird OTA Patch Dart-only patches skip store]
+  FastlaneAndroid --> Testers[Testers get beta]
+  FastlaneIOS --> Testers
+  Shorebird --> Production[Production users get hot patch]
+  style Dev fill:#e3f2fd,stroke:#2196f3
+  style CI fill:#fffde7,stroke:#ffeb3b
+  style Dart fill:#e8f5e9,stroke:#43a047
+  style Test fill:#f3e5f5,stroke:#8e24aa
+  style Build fill:#b2dfdb,stroke:#00897b
+  style BuildIOS fill:#ffe0b2,stroke:#fb8c00
+  style FastlaneAndroid fill:#c8e6c9,stroke:#388e3c
+  style FastlaneIOS fill:#d1c4e9,stroke:#7e57c2
+  style Shorebird fill:#ffd600,stroke:#ff6f00,stroke-width:2px
+  style Testers fill:#99ff99,stroke:#333
+  style Production fill:#ffeb3b,stroke:#333
 ```
+
+Performance Budgets:
+
+- Frame time: < 16ms (60fps)
+- Cold start: < 3s
+- APK size: < 30MB
+- Memory: < 200MB
+- Crash-free: 99.5%
 
 ---
 
 ## Visual Dependency Graph
 
-```
-Phase 1: Foundation
-    │
-    ▼
-Phase 2: State Management ──────────────┐
-    │                                    │
-    ▼                                    │
-Phase 3: Networking & Data ◄─────────────┤
-    │                                    │
-    ▼                                    │
-Phase 4: Authentication                  │
-    │                                    │
-    ├───────────────┐                    │
-    ▼               ▼                    │
-Phase 5: UI     Phase 6: Platform ◄──────┘
-    │               │
-    └───────┬───────┘
-            ▼
-    Phase 7: Testing
-            │
-            ▼
-    Phase 8: Performance & CI/CD
+```mermaid
+graph TD
+  P1[Phase 1: Foundation] --> P2[Phase 2: State Management]
+  P2 --> P3[Phase 3: Networking & Data]
+  P3 --> P4[Phase 4: Authentication]
+  P4 --> P5[Phase 5: UI]
+  P4 --> P6[Phase 6: Platform]
+  P5 --> P7[Phase 7: Testing]
+  P6 --> P7
+  P7 --> P8[Phase 8: Performance & CI/CD]
+  style P1 fill:#e3f2fd,stroke:#2196f3
+  style P2 fill:#fffde7,stroke:#ffeb3b
+  style P3 fill:#e8f5e9,stroke:#43a047
+  style P4 fill:#f3e5f5,stroke:#8e24aa
+  style P5 fill:#b2dfdb,stroke:#00897b
+  style P6 fill:#ffe0b2,stroke:#fb8c00
+  style P7 fill:#c8e6c9,stroke:#388e3c
+  style P8 fill:#ffd600,stroke:#ff6f00,stroke-width:2px
 ```
 
 ---
@@ -535,5 +524,12 @@ Week   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
 
   P = Phase    ███ = Active learning + building
 ```
+
+```
+
+```
+
+```
+
 ```
 ````
