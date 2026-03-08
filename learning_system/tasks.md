@@ -310,10 +310,10 @@ Milestone Timeline:
 - [x] Set up `build.yaml` for all generators
 - [x] Create Freezed entities: `Event`, `Ticket`, `User`, `CheckInResult`
 - [x] Create DTOs with `@JsonSerializable` and `toEntity()` methods
-- [X] Set up barrel files for each feature
-- [X] Configure environment JSON files (`dev.json`, `staging.json`, `prod.json`)
-- [X] Run `build_runner` — all generators pass
-- [ ] Verify project compiles with `flutter analyze`
+- [x] Set up barrel files for each feature
+- [x] Configure environment JSON files (`dev.json`, `staging.json`, `prod.json`)
+- [x] Run `build_runner` — all generators pass
+- [x] Verify project compiles with `flutter analyze`
 
 **Exit Criteria:** Project scaffold matches `project-structure.md` conventions. All entities and DTOs generate correctly.
 
