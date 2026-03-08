@@ -346,7 +346,7 @@ M1 — What You Build:
 
 **Concepts:** C1, C3
 
-- [ ] Create `dioProvider` (singleton, `keepAlive`)
+- [x] Create `dioProvider` (singleton, `keepAlive`)
 - [ ] Wire feature provider graphs: API → Repository → Controller
 - [ ] Implement `EventListController` (AsyncNotifier) with pagination
 - [ ] Implement `EventDetailController` with family provider (`build(String eventId)`)
