@@ -309,7 +309,7 @@ Milestone Timeline:
 - [x] Configure `pubspec.yaml` with all dependencies
 - [x] Set up `build.yaml` for all generators
 - [x] Create Freezed entities: `Event`, `Ticket`, `User`, `CheckInResult`
-- [ ] Create DTOs with `@JsonSerializable` and `toEntity()` methods
+- [x] Create DTOs with `@JsonSerializable` and `toEntity()` methods
 - [ ] Set up barrel files for each feature
 - [ ] Configure environment JSON files (`dev.json`, `staging.json`, `prod.json`)
 - [ ] Run `build_runner` — all generators pass
