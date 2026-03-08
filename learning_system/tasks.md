@@ -8,23 +8,29 @@
 
 This single project exercises **all 21 advanced concepts** from the docs.
 
-```
-╔══════════════════════════════════════════════════════════════════╗
-║                        EventHub App                              ║
-║                                                                  ║
-║   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐   ║
-║   │  Browse  │  │  Buy     │  │  Scan    │  │  Get Push   │   ║
-║   │  Events  │  │  Tickets │  │  QR Code │  │  Reminders  │   ║
-║   └──────────┘  └──────────┘  └──────────┘  └──────────────┘   ║
-║                                                                  ║
-║   👤 Attendee                   👤 Organizer                     ║
-║   • Browse & search events      • Manage guest lists             ║
-║   • Purchase tickets             • Scan tickets at door           ║
-║   • Receive reminders            • View check-in stats            ║
-║   • Show QR ticket               • Share event links              ║
-║                                                                  ║
-║   Concepts Used: ALL 21                                          ║
-╚══════════════════════════════════════════════════════════════════╝
+```mermaid
+graph TD
+  App[EventHub App] --> BrowseEvents[Browse Events]
+  App --> BuyTickets[Buy Tickets]
+  App --> ScanQR[Scan QR Code]
+  App --> PushReminders[Get Push Reminders]
+  App --> Attendee[Attendee]
+  App --> Organizer[Organizer]
+  Attendee --> A1[Browse and search events]
+  Attendee --> A2[Purchase tickets]
+  Attendee --> A3[Receive reminders]
+  Attendee --> A4[Show QR ticket]
+  Organizer --> O1[Manage guest lists]
+  Organizer --> O2[Scan tickets at door]
+  Organizer --> O3[View check-in stats]
+  Organizer --> O4[Share event links]
+  style App fill:#e3f2fd,stroke:#2196f3,stroke-width:3px
+  style BrowseEvents fill:#c8e6c9,stroke:#388e3c
+  style BuyTickets fill:#c8e6c9,stroke:#388e3c
+  style ScanQR fill:#c8e6c9,stroke:#388e3c
+  style PushReminders fill:#c8e6c9,stroke:#388e3c
+  style Attendee fill:#ffe0b2,stroke:#fb8c00
+  style Organizer fill:#f3e5f5,stroke:#8e24aa
 ```
 
 ### Why This Project?
@@ -53,56 +59,45 @@ This single project exercises **all 21 advanced concepts** from the docs.
 
 ### High-Level Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Presentation                          │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────────┐  │
-│  │  Events   │ │ Tickets  │ │ Scanner  │ │   Profile     │  │
-│  │  Screen   │ │  Screen  │ │  Screen  │ │   Screen      │  │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └──────┬────────┘  │
-│       │             │            │               │           │
-│  ┌────┴─────┐ ┌────┴─────┐ ┌────┴─────┐ ┌──────┴────────┐  │
-│  │ EventList │ │ Ticket   │ │ Scanner  │ │   Profile     │  │
-│  │Controller│ │Controller│ │Controller│ │  Controller    │  │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └──────┬────────┘  │
-└───────┼─────────────┼────────────┼──────────────┼────────────┘
-        │             │            │              │
-┌───────┼─────────────┼────────────┼──────────────┼────────────┐
-│       │         Domain           │              │            │
-│  ┌────┴─────┐ ┌────┴─────┐ ┌────┴─────┐ ┌──────┴────────┐  │
-│  │  Event   │ │  Ticket  │ │  CheckIn │ │    User       │  │
-│  │Repository│ │Repository│ │Repository│ │  Repository   │  │
-│  │(abstract)│ │(abstract)│ │(abstract)│ │  (abstract)   │  │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └──────┬────────┘  │
-└───────┼─────────────┼────────────┼──────────────┼────────────┘
-        │             │            │              │
-┌───────┼─────────────┼────────────┼──────────────┼────────────┐
-│       │           Data           │              │            │
-│  ┌────┴──────────────┴───────────┴──────────────┴─────────┐  │
-│  │                                                         │  │
-│  │  ┌─────────────┐    ┌─────────────┐    ┌────────────┐  │  │
-│  │  │  Retrofit    │    │   GraphQL   │    │   Drift    │  │  │
-│  │  │  API Service │    │   Queries   │    │   DAOs     │  │  │
-│  │  └──────┬──────┘    └──────┬──────┘    └─────┬──────┘  │  │
-│  │         │                  │                  │         │  │
-│  │         └────────┬─────────┘                  │         │  │
-│  │                  │                            │         │  │
-│  │            ┌─────┴──────┐                     │         │  │
-│  │            │    Dio     │                     │         │  │
-│  │            │ (+ interceptors)                 │         │  │
-│  │            └────────────┘                     │         │  │
-│  └────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────┘
-        │
-┌───────┴──────────────────────────────────────────────────────┐
-│                          Core                                 │
-│  ┌──────┐ ┌────────┐ ┌───────┐ ┌──────┐ ┌────────┐ ┌──────┐│
-│  │ Auth │ │Network │ │  DB   │ │Theme │ │  i18n  │ │Router││
-│  └──────┘ └────────┘ └───────┘ └──────┘ └────────┘ └──────┘│
-│  ┌───────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ │
-│  │Notifications│ │RemoteConfig│ │  Storage   │ │   Utils   │ │
-│  └───────────┘ └────────────┘ └────────────┘ └────────────┘ │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+  subgraph Presentation
+    ES[Events Screen] --> ELC[EventList Controller]
+    TS[Tickets Screen] --> TC[Ticket Controller]
+    SS[Scanner Screen] --> SC[Scanner Controller]
+    PS[Profile Screen] --> PC[Profile Controller]
+  end
+  subgraph Domain
+    ELC --> ER[Event Repository]
+    TC --> TR[Ticket Repository]
+    SC --> CR[CheckIn Repository]
+    PC --> UR[User Repository]
+  end
+  subgraph Data
+    ER --> Retrofit[Retrofit API Service]
+    ER --> GQL[GraphQL Queries]
+    ER --> DriftDAO[Drift DAOs]
+    TR --> Retrofit
+    CR --> Retrofit
+    UR --> Retrofit
+    Retrofit --> Dio
+    GQL --> Dio
+  end
+  subgraph Core
+    Auth
+    Network
+    DB
+    Theme
+    i18n
+    Router
+    Notifications
+    RemoteConfig
+    Storage
+  end
+  style Presentation fill:#e3f2fd,stroke:#2196f3
+  style Domain fill:#fffde7,stroke:#ffeb3b
+  style Data fill:#e8f5e9,stroke:#43a047
+  style Core fill:#f3e5f5,stroke:#8e24aa
 ```
 
 ### Feature Slices
@@ -146,26 +141,17 @@ lib/
 
 ### Data Flow Per Feature
 
-```
-                    ┌─────────────────┐
-                    │    Screen        │  ref.watch(controllerProvider)
-                    │ (ConsumerWidget) │
-                    └────────┬────────┘
-                             │
-                    ┌────────┴────────┐
-                    │   Controller     │  AsyncNotifier via @riverpod
-                    │ (AsyncNotifier)  │  ref.watch(repositoryProvider)
-                    └────────┬────────┘
-                             │
-                    ┌────────┴────────┐
-                    │   Repository     │  Abstract interface (domain)
-                    │ (Implementation) │  Concrete impl (data)
-                    └───┬─────────┬───┘
-                        │         │
-               ┌────────┴──┐  ┌──┴────────┐
-               │ API Service│  │   DAO     │
-               │ (Retrofit) │  │  (Drift)  │
-               └────────────┘  └───────────┘
+```mermaid
+flowchart TD
+  Screen[Screen - ConsumerWidget] --> Controller[Controller - AsyncNotifier]
+  Controller --> Repository[Repository - Abstract]
+  Repository --> API[API Service - Retrofit]
+  Repository --> DAO[DAO - Drift]
+  style Screen fill:#e3f2fd,stroke:#2196f3
+  style Controller fill:#fffde7,stroke:#ffeb3b
+  style Repository fill:#e8f5e9,stroke:#43a047
+  style API fill:#ffe0b2,stroke:#fb8c00
+  style DAO fill:#d1c4e9,stroke:#7e57c2
 ```
 
 ### Technology Stack Summary
@@ -285,20 +271,25 @@ query GetEvents(
 
 ## Milestones
 
-```
-Milestone Timeline:
-
-  M1        M2        M3          M4       M5        M6       M7        M8       M9
-  Scaffold  State     Network     DB       GraphQL   UI       Platform  Testing  CI/CD
-  │         │         & Auth      │        & Config  Polish   Features  │        │
-  ▼         ▼         ▼           ▼        ▼         ▼        ▼         ▼        ▼
-  ┌───┐    ┌───┐    ┌───────┐   ┌───┐   ┌───┐    ┌───┐    ┌───┐    ┌───┐    ┌───┐
-  │ 1 │───▶│ 2 │───▶│ 3     │──▶│ 4 │──▶│ 5 │───▶│ 6 │───▶│ 7 │───▶│ 8 │───▶│ 9 │
-  │   │    │   │    │       │   │   │   │   │    │   │    │   │    │   │    │   │
-  └───┘    └───┘    └───────┘   └───┘   └───┘    └───┘    └───┘    └───┘    └───┘
-  Wk 1-2   Wk 3-4   Wk 5-8     Wk 9-10 Wk 11-12 Wk 13-14 Wk 15-16 Wk 17-18 Wk 19-20
-
-  ════ Foundation ════  ════ Data ════  ════ Polish ════  ════ Quality ════
+```mermaid
+flowchart LR
+  M1[M1 Scaffold Wk 1-2] --> M2[M2 State Wk 3-4]
+  M2 --> M3[M3 Network and Auth Wk 5-8]
+  M3 --> M4[M4 DB Wk 9-10]
+  M4 --> M5[M5 GraphQL and Config Wk 11-12]
+  M5 --> M6[M6 UI Polish Wk 13-14]
+  M6 --> M7[M7 Platform Features Wk 15-16]
+  M7 --> M8[M8 Testing Wk 17-18]
+  M8 --> M9[M9 CI/CD Wk 19-20]
+  style M1 fill:#e3f2fd,stroke:#2196f3
+  style M2 fill:#fffde7,stroke:#ffeb3b
+  style M3 fill:#e8f5e9,stroke:#43a047
+  style M4 fill:#f3e5f5,stroke:#8e24aa
+  style M5 fill:#b2dfdb,stroke:#00897b
+  style M6 fill:#ffe0b2,stroke:#fb8c00
+  style M7 fill:#d1c4e9,stroke:#7e57c2
+  style M8 fill:#c8e6c9,stroke:#388e3c
+  style M9 fill:#ffd600,stroke:#ff6f00,stroke-width:2px
 ```
 
 ### M1: Project Scaffold & Foundation (Week 1–2)
@@ -366,35 +357,24 @@ M1 — What You Build:
 
 **Exit Criteria:** Full Riverpod provider graph for events feature. Loading → Data → Error states all handled.
 
-```
-M2 — Screen State Machine:
-
-  ┌─────────────────────────────────────────────┐
-  │            EventListScreen                    │
-  │                                               │
-  │   orderAsync.when(                            │
-  │     loading: ()  ──▶ ⏳ Spinner               │
-  │     data: (list) ──▶ 📋 ListView.builder      │
-  │     error: (e)   ──▶ ❌ ErrorView + Retry     │
-  │   )                                           │
-  │                                               │
-  │   Pull-to-refresh ──▶ ref.invalidateSelf()    │
-  │   Error snackbar  ──▶ ref.listen(...)         │
-  │   Item count only ──▶ ref.watch(.select())    │
-  └─────────────────────────────────────────────┘
-
-  Provider Wiring in providers.dart:
-
-  eventApiServiceProvider ──▶ EventApiService(dio)
-          │
-          ▼
-  eventRepositoryProvider ──▶ EventRepositoryImpl(api, dao)
-          │
-          ▼
-  eventListControllerProvider ──▶ AsyncNotifier<List<Event>>
-          │
-          ▼
-  upcomingEventsProvider ──▶ filtered derived provider
+```mermaid
+flowchart TD
+  EventListScreen --> AsyncWhen{orderAsync.when}
+  AsyncWhen --> LoadingState[Loading - Spinner]
+  AsyncWhen --> DataState[Data - ListView.builder]
+  AsyncWhen --> ErrorState[Error - ErrorView + Retry]
+  EventListScreen --> PullRefresh[Pull-to-refresh - ref.invalidateSelf]
+  EventListScreen --> ErrorSnackbar[Error snackbar - ref.listen]
+  EventListScreen --> ItemCount[Item count only - ref.watch select]
+  subgraph Provider Wiring
+    eventApiServiceProvider --> eventRepositoryProvider
+    eventRepositoryProvider --> eventListControllerProvider
+    eventListControllerProvider --> upcomingEventsProvider
+  end
+  style EventListScreen fill:#e3f2fd,stroke:#2196f3
+  style LoadingState fill:#ffe0b2,stroke:#fb8c00
+  style DataState fill:#c8e6c9,stroke:#388e3c
+  style ErrorState fill:#ffcdd2,stroke:#e53935
 ```
 
 ---
@@ -417,52 +397,37 @@ M2 — Screen State Machine:
 
 **Exit Criteria:** Full auth lifecycle works. 401 → refresh → retry or logout works. Error snackbars show localized messages.
 
-```
-M3 — Full Network + Auth Architecture:
+```mermaid
+flowchart TD
+    subgraph Interceptors["Dio Interceptor Chain"]
+        REQ["Request"]
+        ERR_INT["ErrorInterceptor"]
+        AUTH_INT["AuthInterceptor - injects Bearer token"]
+        LOG["Log"]
+        REQ --> ERR_INT --> AUTH_INT --> LOG
 
-  ┌─────────────────────────────────────────────────────────────┐
-  │                   Dio Interceptor Chain                       │
-  │                                                               │
-  │   Request ──▶ ErrorInterceptor ──▶ AuthInterceptor ──▶ Log   │
-  │                     │                    │                    │
-  │                     │              Injects:                   │
-  │                     │              Authorization:             │
-  │                     │              Bearer <token>             │
-  │                     ▼                    │                    │
-  │              DioException?               │                    │
-  │              ┌───────────┐               │                    │
-  │              │ timeout   │──▶ NetworkException                │
-  │              │ 401       │──▶ UnauthorizedException ──┐      │
-  │              │ 422       │──▶ ValidationException     │      │
-  │              │ 4xx       │──▶ ServerException         │      │
-  │              │ 5xx       │──▶ ServerException         │      │
-  │              │ other     │──▶ UnknownException        │      │
-  │              └───────────┘                            │      │
-  │                                                       │      │
-  │              ┌────────────────────────────────────────┘      │
-  │              │  QueuedInterceptor                            │
-  │              │                                               │
-  │              │    401 ──▶ try refresh token                  │
-  │              │              │                                │
-  │              │         ┌────┴────┐                           │
-  │              │         │         │                           │
-  │              │      Success   Failure                        │
-  │              │      retry     logout()                       │
-  │              │      request   ──▶ Unauthenticated            │
-  │              │                    ──▶ GoRouter redirect      │
-  │              │                        to /auth/login         │
-  │              └───────────────────────────────────────────────│
-  └─────────────────────────────────────────────────────────────┘
+        ERR_INT -->|"timeout"| NET_EX["NetworkException"]
+        ERR_INT -->|"401"| UNAUTH_EX["UnauthorizedException"]
+        ERR_INT -->|"422"| VAL_EX["ValidationException"]
+        ERR_INT -->|"4xx / 5xx"| SRV_EX["ServerException"]
+        ERR_INT -->|"other"| UNK_EX["UnknownException"]
+    end
 
-  Auth Screen Flow:
+    subgraph Queued["QueuedInterceptor - 401 Handling"]
+        REFRESH["try refresh token"]
+        SUCCESS["Success - retry request"]
+        FAILURE["Failure - logout, redirect to /auth/login"]
+        UNAUTH_EX --> REFRESH
+        REFRESH --> SUCCESS
+        REFRESH --> FAILURE
+    end
 
-  ┌────────────┐     ┌────────────┐     ┌────────────┐
-  │   Login    │────▶│    OTP     │────▶│   Home     │
-  │   Screen   │     │   Screen   │     │  (Events)  │
-  │            │     │            │     │            │
-  │ Enter phone│     │ Enter code │     │ Redirected │
-  │ POST /login│     │ Verify OTP │     │  by guard  │
-  └────────────┘     └────────────┘     └────────────┘
+    subgraph AuthFlow["Auth Screen Flow"]
+        LOGIN["Login Screen - Enter phone, POST /login"]
+        OTP["OTP Screen - Enter code, Verify OTP"]
+        HOME["Home Screen - Events, redirected by guard"]
+        LOGIN --> OTP --> HOME
+    end
 ```
 
 ---
@@ -481,47 +446,37 @@ M3 — Full Network + Auth Architecture:
 
 **Exit Criteria:** App works offline (shows cached data). Migration tested. Reactive streams update UI when cache changes.
 
-```
-M4 — Drift Database Architecture:
-
-  ┌─────────────────────────────────────────────────────────────┐
-  │                     core/database/                           │
-  │                                                              │
-  │   AppDatabase  (single instance, exposed via provider)       │
-  │   ├── Tables: Events, Tickets, CachedUsers                  │
-  │   ├── schemaVersion: 2                                      │
-  │   └── migration:                                             │
-  │       ├── v1 → v2: add 'priority' column                    │
-  │       └── v2 → v3: create Notifications table               │
-  └──────────────────────┬──────────────────────────────────────┘
-                         │
-              ┌──────────┴───────────┐
-              │                      │
-  ┌───────────▼──────────┐  ┌───────▼────────────┐
-  │      EventDao        │  │     TicketDao      │
-  │  (DatabaseAccessor)  │  │  (DatabaseAccessor)│
-  │                      │  │                    │
-  │  getAllEvents()       │  │  getMyTickets()    │
-  │  watchAllEvents() ◀──stream  getByEventId()  │
-  │  getByRemoteId()     │  │  insertTicket()    │
-  │  insertEvent()       │  │  deleteTicket()    │
-  │  deleteByRemoteId()  │  │                    │
-  └──────────────────────┘  └────────────────────┘
-
-  Repository Offline Strategy:
-
-  ┌─────────┐    try     ┌─────────┐   cache    ┌─────────┐
-  │ Screen  │──────────▶│  API    │──────────▶│  Drift  │
-  │         │            │ Service │            │   DAO   │
-  └─────────┘            └────┬────┘            └────┬────┘
-                              │                      │
-                         ┌────┴────┐                 │
-                         │ Network │                 │
-                         │  Error? │                 │
-                         └────┬────┘                 │
-                              │ yes                  │
-                              └──────── read ───────▶│
-                                       cache         │
+```mermaid
+flowchart TD
+  subgraph AppDatabase
+    Tables[Tables: Events, Tickets, CachedUsers]
+    Schema[schemaVersion: 2]
+    Migration[v1 to v2: add priority column]
+  end
+  AppDatabase --> EventDao
+  AppDatabase --> TicketDao
+  subgraph EventDao
+    getAllEvents
+    watchAllEvents[watchAllEvents - stream]
+    getByRemoteId
+    insertEvent
+    deleteByRemoteId
+  end
+  subgraph TicketDao
+    getMyTickets
+    getByEventId
+    insertTicket
+    deleteTicket
+  end
+  subgraph Offline Strategy
+    Screen --> APIService[API Service]
+    APIService --> |cache result| DriftDAO[Drift DAO]
+    APIService --> |Network Error| ReadCache[Read from cache]
+    ReadCache --> DriftDAO
+  end
+  style AppDatabase fill:#e3f2fd,stroke:#2196f3
+  style EventDao fill:#c8e6c9,stroke:#388e3c
+  style TicketDao fill:#d1c4e9,stroke:#7e57c2
 ```
 
 ---
@@ -542,55 +497,29 @@ M4 — Drift Database Architecture:
 
 **Exit Criteria:** Event detail loads via GraphQL. Feature flag hides/shows purchase button. Environment switching works.
 
-```
-M5 — Dual Protocol + Config Architecture:
-
-  ┌─────────────────────────────────────────────────────────────┐
-  │                    Two Data Protocols                         │
-  │                                                              │
-  │    REST (writes)              GraphQL (reads)                │
-  │    ┌─────────────┐           ┌──────────────────┐           │
-  │    │  POST /buy  │           │ query GetEvent   │           │
-  │    │  PUT /user  │           │ query GetEvents  │           │
-  │    │  POST /scan │           │                  │           │
-  │    └──────┬──────┘           └────────┬─────────┘           │
-  │           │                           │                     │
-  │           │      Shared Dio           │                     │
-  │           │    ┌──────────┐           │                     │
-  │           └───▶│   Dio    │◀──────────┘                     │
-  │                │ + Auth   │   (via DioLink)                 │
-  │                │ + Error  │                                  │
-  │                │ + Log    │                                  │
-  │                └──────────┘                                  │
-  └─────────────────────────────────────────────────────────────┘
-
-  Remote Config Flow:
-
-  App Launch
-      │
-      ▼
-  ┌──────────────┐   fetch    ┌──────────────┐
-  │    Splash    │──────────▶│   Backend    │
-  │    Screen    │            │ /config      │
-  └──────┬───────┘            └──────┬───────┘
-         │                           │
-         │      ┌────────────────────┘
-         │      │ response
-         │      ▼
-         │   ┌──────────────────────┐
-         │   │  SharedPreferences   │  ◀── cache locally
-         │   │  (offline fallback)  │
-         │   └──────────┬───────────┘
-         │              │
-         ▼              ▼
-  ┌─────────────────────────────────┐
-  │   appConfigurationProvider      │
-  │   (keepAlive, loaded once)      │
-  │                                  │
-  │   config.isEventsEnabled ──▶ 🟢 │
-  │   config.isTicketSalesEnabled ▶ 🔴 (hidden)
-  │   config.maxUploadSizeBytes     │
-  └─────────────────────────────────┘
+```mermaid
+flowchart TD
+  subgraph Two Data Protocols
+    REST[REST - writes] --> Dio
+    GraphQL[GraphQL - reads] --> Dio
+    Dio --> AuthInterceptor[Auth Interceptor]
+    Dio --> ErrorInterceptor[Error Interceptor]
+    Dio --> LogInterceptor[Log Interceptor]
+  end
+  subgraph Remote Config Flow
+    AppLaunch[App Launch - Splash Screen] --> FetchConfig[Fetch from Backend /config]
+    FetchConfig --> CachePrefs[SharedPreferences - cache locally]
+    CachePrefs --> ConfigProvider[appConfigurationProvider]
+    ConfigProvider --> EventsEnabled[isEventsEnabled]
+    ConfigProvider --> TicketSalesEnabled[isTicketSalesEnabled]
+    ConfigProvider --> MaxUpload[maxUploadSizeBytes]
+  end
+  style REST fill:#e3f2fd,stroke:#2196f3
+  style GraphQL fill:#f3e5f5,stroke:#8e24aa
+  style Dio fill:#fffde7,stroke:#ffeb3b
+  style ConfigProvider fill:#ffd600,stroke:#ff6f00,stroke-width:2px
+  style EventsEnabled fill:#c8e6c9,stroke:#388e3c
+  style TicketSalesEnabled fill:#ffcdd2,stroke:#e53935
 ```
 
 ---
@@ -613,60 +542,49 @@ M5 — Dual Protocol + Config Architecture:
 
 **Exit Criteria:** Light/dark mode toggle works. Arabic locale works. Tablet layout adapts. All icons are SVG-compiled.
 
-```
-M6 — UI Architecture:
+```mermaid
+flowchart TD
+    subgraph Theme["Theme System"]
+        TN["ThemeModeNotifier - persisted to SharedPrefs"]
+        LIGHT["AppTheme.light"]
+        DARK["AppTheme.dark"]
+        MODES["system / light / dark"]
+        TN --> LIGHT
+        TN --> DARK
+        TN --> MODES
 
-  ┌─────────────────────────────────────────────────────────────┐
-  │                   Theme System                                │
-  │                                                               │
-  │   AppTheme.light ◀──┐    ┌──▶ AppTheme.dark                  │
-  │                      │    │                                   │
-  │              ThemeModeNotifier                                │
-  │              (persisted to SharedPrefs)                       │
-  │              ┌────────────────────────┐                       │
-  │              │  system │ light │ dark │                       │
-  │              └────────────────────────┘                       │
-  │                                                               │
-  │   Widget Access:                                              │
-  │   ├── colorScheme.primary     (M3 role)                       │
-  │   ├── colorScheme.surface     (M3 role)                       │
-  │   ├── context.appColors.success (ThemeExtension)              │
-  │   └── textTheme.headlineMedium (M3 type scale)               │
-  │                                                               │
-  │   FORBIDDEN:                                                  │
-  │   ✗ Colors.red                                                │
-  │   ✗ TextStyle(fontSize: 24)                                   │
-  │   ✗ AppPalette.primary600  (in widgets)                       │
-  └─────────────────────────────────────────────────────────────┘
+        WA["Widget Access"]
+        WA1["colorScheme.primary - M3 role"]
+        WA2["colorScheme.surface - M3 role"]
+        WA3["context.appColors.success - ThemeExtension"]
+        WA4["textTheme.headlineMedium - M3 type scale"]
+        WA --> WA1
+        WA --> WA2
+        WA --> WA3
+        WA --> WA4
 
-  ┌─────────────────────────────────────────────────────────────┐
-  │                   i18n Pipeline                               │
-  │                                                               │
-  │   assets/i18n/en.i18n.yaml ──┐                                │
-  │   assets/i18n/ar.i18n.yaml ──┤                                │
-  │                               ▼                               │
-  │                       dart run slang                           │
-  │                               │                               │
-  │                               ▼                               │
-  │                    lib/core/i18n/strings.g.dart                │
-  │                               │                               │
-  │                               ▼                               │
-  │                     t.events.title  ◀── type-safe!             │
-  │                     t.errors.network                           │
-  │                     context.t.auth.login ◀── reactive          │
-  └─────────────────────────────────────────────────────────────┘
+        FORBID["FORBIDDEN: Colors.red / TextStyle fontSize / AppPalette in widgets"]
+    end
 
-  ┌─────────────────────────────────────────────────────────────┐
-  │                SVG Build Pipeline                             │
-  │                                                               │
-  │   assets/svg/icon.svg                                         │
-  │        │                                                      │
-  │        ▼  (build-time via vector_graphics_compiler)           │
-  │   assets/svg/icon.vec  ◀── binary, zero runtime parsing      │
-  │        │                                                      │
-  │        ▼                                                      │
-  │   SvgPicture.asset('assets/svg/icon.svg')  ◀── in widget     │
-  └─────────────────────────────────────────────────────────────┘
+    subgraph I18n["i18n Pipeline"]
+        EN["assets/i18n/en.i18n.yaml"]
+        AR["assets/i18n/ar.i18n.yaml"]
+        SLANG["dart run slang"]
+        GEN["lib/core/i18n/strings.g.dart"]
+        USAGE["t.events.title - type-safe / context.t.auth.login - reactive"]
+        EN --> SLANG
+        AR --> SLANG
+        SLANG --> GEN
+        GEN --> USAGE
+    end
+
+    subgraph SVG["SVG Build Pipeline"]
+        SVGF["assets/svg/icon.svg"]
+        VEC["assets/svg/icon.vec - binary, zero runtime parsing"]
+        PIC["SvgPicture.asset in widget"]
+        SVGF -->|"build-time via vector_graphics_compiler"| VEC
+        VEC --> PIC
+    end
 ```
 
 ---
@@ -689,76 +607,55 @@ M6 — UI Architecture:
 
 **Exit Criteria:** Share event link → tap → app opens to event detail. Push received in all app states. QR check-in works end-to-end.
 
-```
-M7 — Platform Integration Map:
+```mermaid
+flowchart TD
+    subgraph DL["Deep Linking"]
+        ANDROID["Android App Links - assetlinks.json, autoVerify"]
+        IOS["iOS Universal Links - AASA file, Associated Domains"]
+        APPLINKS["app_links package"]
+        ROUTER["GoRouter resolves routes"]
+        EVT["EventDetailScreen via /events/:id"]
+        TKT["TicketDetailScreen via /tickets/:id"]
+        ANDROID --> APPLINKS
+        IOS --> APPLINKS
+        APPLINKS --> ROUTER
+        ROUTER --> EVT
+        ROUTER --> TKT
+    end
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                DEEP LINKING                                     │
-  │                                                                 │
-  │   ┌──────────────────────┐    ┌──────────────────────┐          │
-  │   │ Android App Links    │    │ iOS Universal Links  │          │
-  │   │ assetlinks.json      │    │ AASA file            │          │
-  │   │ autoVerify=true      │    │ Associated Domains   │          │
-  │   └──────────┬───────────┘    └──────────┬───────────┘          │
-  │              └──────────┬───────────────┘                       │
-  │                         ▼                                       │
-  │                   app_links                                     │
-  │                    package                                      │
-  │                         │                                       │
-  │             ┌───────────┴───────────┐                           │
-  │             │   GoRouter resolves   │                           │
-  │             │    /events/:id  ───▶ EventDetailScreen             │
-  │             │    /tickets/:id ───▶ TicketDetailScreen            │
-  │             └───────────────────────┘                           │
-  └─────────────────────────────────────────────────────────────────┘
+    subgraph PUSH["Push Notifications"]
+        FCM["FCM Server"]
+        FBM["firebase_messaging"]
+        FG["Foreground - onMessage"]
+        BG["Background - onBgMsg"]
+        TM["Terminated - getInitialMsg"]
+        LOCAL["flutter_local_notifications - show and handle tap"]
+        ROUTE["GoRouter.go deepLink"]
+        FCM -->|"message payload"| FBM
+        FBM --> FG
+        FBM --> BG
+        FBM --> TM
+        FG --> LOCAL
+        BG --> LOCAL
+        TM --> LOCAL
+        LOCAL -->|"route from payload"| ROUTE
+    end
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │             PUSH NOTIFICATIONS                                  │
-  │                                                                 │
-  │   ┌─────────────┐                                               │
-  │   │ FCM Server  │                                               │
-  │   └──────┬──────┘                                               │
-  │          │  message payload                                     │
-  │          ▼                                                      │
-  │   ┌─────────────────────────────────────────┐                   │
-  │   │      firebase_messaging                 │                   │
-  │   │                                         │                   │
-  │   │  ┌─────────┐ ┌────────────┐ ┌────────┐  │                   │
-  │   │  │Foreground│ │ Background │ │Terminat│  │                   │
-  │   │  │ onMsg    │ │ onBgMsg() │ │ getInit│  │                   │
-  │   │  └────┬────┘ └─────┬──────┘ └───┬────┘  │                   │
-  │   │       │            │            │       │                   │
-  │   │       ▼            ▼            ▼       │                   │
-  │   │  flutter_local_notifications            │                   │
-  │   │       (show / handle tap)               │                   │
-  │   └──────────────┬──────────────────────────┘                   │
-  │                  │  route from payload                          │
-  │                  ▼                                              │
-  │            GoRouter.go(deepLink)                                │
-  └─────────────────────────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────────────────────────┐
-  │              QR CODE SCANNING                                   │
-  │                                                                 │
-  │   ┌─────────────────────┐                                       │
-  │   │  mobile_scanner v7  │                                       │
-  │   │  (ML Kit / Vision)  │                                       │
-  │   └──────────┬──────────┘                                       │
-  │              │                                                  │
-  │              ▼                                                  │
-  │   ┌──────────────────────┐      ┌──────────────────┐            │
-  │   │  Scan Window (ROI)   │ ───▶ │ Parse QR Payload │            │
-  │   │  [Guided Overlay]    │      │ {ticketId, code}  │           │
-  │   └──────────────────────┘      └────────┬─────────┘            │
-  │                                          │                     │
-  │                                          ▼                     │
-  │                               ┌────────────────────┐           │
-  │                               │  POST /check-in    │           │
-  │                               │  ─▶ Success ✓      │           │
-  │                               │  ─▶ Already Used ✗  │          │
-  │                               │  ─▶ Invalid ✗      │           │
-  │                               └────────────────────┘           │
-  └─────────────────────────────────────────────────────────────────┘
+    subgraph QR["QR Code Scanning"]
+        SCANNER["mobile_scanner v7 - ML Kit / Vision"]
+        SCAN["Scan Window with Guided Overlay"]
+        PARSE["Parse QR Payload - ticketId, code"]
+        POST["POST /check-in"]
+        SUCCESS["Success"]
+        ALREADY["Already Used"]
+        INVALID["Invalid"]
+        SCANNER --> SCAN
+        SCAN --> PARSE
+        PARSE --> POST
+        POST --> SUCCESS
+        POST --> ALREADY
+        POST --> INVALID
+    end
 ```
 
 ---
@@ -779,68 +676,62 @@ M7 — Platform Integration Map:
 
 **Exit Criteria:** 80%+ coverage on two features. All widget tests pass. Integration test passes.
 
+```mermaid
+flowchart TD
+    subgraph Pyramid["Testing Pyramid"]
+        E2E["E2E - 1-2 integration tests: login, buy ticket, view"]
+        WIDGET["Widget - Every screen x 3 states: data, loading, error"]
+        UNIT["Unit - Entities, repos, controllers with mock overrides"]
+        E2E --> WIDGET --> UNIT
+    end
 ```
-M8 — Testing Pyramid:
 
-                          ╱╲
-                         ╱  ╲
-                        ╱ E2E╲
-                       ╱──────╲        ← 1-2 integration tests
-                      ╱ Integr.╲         (login → buy ticket → view)
-                     ╱──────────╲
-                    ╱   Widget   ╲      ← Every screen × 3 states
-                   ╱──────────────╲       (data, loading, error)
-                  ╱     Unit       ╲    ← Entities, repos, controllers
-                 ╱──────────────────╲     (mock repos via overrides)
-                ╱────────────────────╲
+Test Infrastructure:
 
-  Test Infrastructure:
+```
+test/
+├── helpers/
+│   ├── mocks.dart           -- @GenerateMocks
+│   ├── fakes.dart           -- FakeEvent, FakeTicket
+│   └── test_app.dart        -- ProviderScope + overrides + MaterialApp
+│
+├── features/
+│   ├── events/
+│   │   ├── data/
+│   │   │   └── events_repo_test.dart    -- mock API, verify fallback
+│   │   ├── domain/
+│   │   │   └── event_entity_test.dart   -- equality, copyWith, JSON
+│   │   ├── presentation/
+│   │   │   ├── events_controller_test.dart -- ProviderContainer
+│   │   │   └── events_screen_test.dart    -- pump + verify widgets
+│   │   └── drift/
+│   │       └── events_dao_test.dart     -- in-memory DB
+│   └── tickets/
+│       └── ...  (mirror events)
+│
+└── integration/
+    └── purchase_flow_test.dart          -- full login, purchase, view
+```
 
-  test/
-  ├── helpers/
-  │   ├── mocks.dart           ◀── @GenerateMocks([EventsRepository, ...])
-  │   ├── fakes.dart           ◀── FakeEvent(), FakeTicket()
-  │   └── test_app.dart        ◀── ProviderScope + overrides + MaterialApp
-  │
-  ├── features/
-  │   ├── events/
-  │   │   ├── data/
-  │   │   │   └── events_repo_test.dart    ← mock API, verify fallback
-  │   │   ├── domain/
-  │   │   │   └── event_entity_test.dart   ← equality, copyWith, JSON
-  │   │   ├── presentation/
-  │   │   │   ├── events_controller_test.dart ← ProviderContainer
-  │   │   │   └── events_screen_test.dart    ← pump + verify widgets
-  │   │   └── drift/
-  │   │       └── events_dao_test.dart     ← in-memory DB
-  │   └── tickets/
-  │       └── ...  (mirror events)
-  │
-  └── integration/
-      └── purchase_flow_test.dart          ← full login → purchase → view
+```mermaid
+flowchart TD
+    subgraph UnitTest["UNIT - Repository"]
+        MOCK["MockApiService"]
+        VERIFY["Verify entities or fallback to cached data"]
+        MOCK -->|"mock success / mock failure"| VERIFY
+    end
 
-  Test Pattern per Layer:
-  ┌───────────────────────────────────────────────────────────────┐
-  │  UNIT (Repository)                                           │
-  │  ┌──────────────┐   mock success   ┌─────────────────┐       │
-  │  │ MockApiService│ ───────────────▶ │ verify entities │       │
-  │  │              │   mock failure   │ verify fallback │       │
-  │  └──────────────┘ ───────────────▶ │ to cached data  │       │
-  │                                    └─────────────────┘       │
-  ├───────────────────────────────────────────────────────────────┤
-  │  CONTROLLER (AsyncNotifier)                                  │
-  │  ┌──────────────────────┐   ┌──────────────────────────┐     │
-  │  │ ProviderContainer     │   │ verify AsyncValue states │     │
-  │  │ + repository override │──▶│ loading → data / error   │     │
-  │  └──────────────────────┘   └──────────────────────────┘     │
-  ├───────────────────────────────────────────────────────────────┤
-  │  WIDGET (Screen)                                             │
-  │  ┌─────────────┐    ┌──────────────────────────────────┐     │
-  │  │ testApp()    │    │ pumpWidget → find text/buttons   │     │
-  │  │ wrapper with │───▶│ verify loading spinner shown     │     │
-  │  │ mock provider│    │ verify error message displayed   │     │
-  │  └─────────────┘    └──────────────────────────────────┘     │
-  └───────────────────────────────────────────────────────────────┘
+    subgraph ControllerTest["CONTROLLER - AsyncNotifier"]
+        PC["ProviderContainer + repository override"]
+        AV["Verify AsyncValue states: loading, data, error"]
+        PC --> AV
+    end
+
+    subgraph WidgetTest["WIDGET - Screen"]
+        TA["testApp wrapper with mock provider"]
+        PW["pumpWidget, find text/buttons, verify spinner/error"]
+        TA --> PW
+    end
 ```
 
 ---
@@ -864,63 +755,57 @@ M8 — Testing Pyramid:
 
 **Exit Criteria:** CI green on every push. Beta distributed to testers. OTA patch delivered successfully.
 
+```mermaid
+flowchart TD
+    subgraph CI["GitHub Actions Workflow"]
+        PUSH["git push"]
+        ANALYZE["Analyze - dart analyze"]
+        TEST["Test - flutter test"]
+        BUILD["Build - APK / IPA"]
+        PUSH --> ANALYZE --> TEST --> BUILD
+    end
+
+    subgraph DIST["Fastlane Distribution"]
+        AND_DIST["Android to Firebase App Distribution"]
+        IOS_DIST["iOS to Firebase App Distribution - Match certificates"]
+        BUILD --> AND_DIST
+        BUILD --> IOS_DIST
+    end
+
+    subgraph OTA["Shorebird OTA Patch"]
+        REL["shorebird release - v1"]
+        FIX["fix bug - shorebird patch android"]
+        USERS["users get patch silently"]
+        AND_DIST --> REL
+        IOS_DIST --> REL
+        REL --> FIX --> USERS
+    end
 ```
-M9 — CI/CD Pipeline & Performance Budgets:
 
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                GitHub Actions Workflow                          │
-  │                                                                 │
-  │   git push ───▶ ┌─────────┐   ┌──────────┐   ┌─────────────┐  │
-  │                 │ Analyze │──▶│   Test   │──▶│    Build    │  │
-  │                 │ dart    │   │ flutter  │   │ APK / IPA   │  │
-  │                 │ analyze │   │ test     │   │             │  │
-  │                 └─────────┘   └──────────┘   └──────┬──────┘  │
-  │                                                      │         │
-  │                               ┌──────────────────────┘         │
-  │                               ▼                                │
-  │                 ┌───────────────────────────┐                   │
-  │                 │   Fastlane Distribution    │                  │
-  │                 │                           │                   │
-  │                 │  Android ──▶ Firebase AD   │                  │
-  │                 │  iOS ──────▶ Firebase AD   │                  │
-  │                 │   (Match certificates)     │                  │
-  │                 └──────────────┬────────────┘                   │
-  │                                │                               │
-  │                                ▼                               │
-  │                 ┌───────────────────────────┐                   │
-  │                 │   Shorebird OTA Patch     │                   │
-  │                 │                           │                   │
-  │                 │  shorebird release ──▶ v1  │                  │
-  │                 │  fix bug ──▶ shorebird     │                  │
-  │                 │        patch android       │                  │
-  │                 │  users get patch silently  │                  │
-  │                 └───────────────────────────┘                   │
-  └─────────────────────────────────────────────────────────────────┘
+Cache Strategy (speeds up CI by ~60%):
 
-  Cache Strategy (speeds up CI by ~60%):
-  ┌────────────────────────────────────────────────────┐
-  │  Cache Key Format: runner.os + hashFiles(lock)     │
-  │                                                    │
-  │  ┌────────────┐  ┌────────────┐  ┌──────────────┐  │
-  │  │ Pub Cache  │  │  Gradle    │  │  CocoaPods   │  │
-  │  │ ~/.pub-cach│  │ ~/.gradle/ │  │ ~/Library/   │  │
-  │  │ pubspec.lo │  │ build.grad │  │ Caches/Cocoa │  │
-  │  └────────────┘  └────────────┘  └──────────────┘  │
-  └────────────────────────────────────────────────────┘
-
-  Performance Budgets:
-  ┌─────────────────────────────────────────────────┐
-  │  Metric             │  Budget    │  Tool        │
-  │─────────────────────┼────────────┼──────────────│
-  │  Frame render       │  < 16ms    │  DevTools    │
-  │  Cold start         │  < 3s      │  Stopwatch   │
-  │  APK size           │  < 25MB    │  --analyze   │
-  │  Widget rebuilds    │  minimal   │  select()    │
-  │  List scrolling     │  60fps     │  builder+ext │
-  │  Image loading      │  cached    │  CachedImg   │
-  │  SVG rendering      │  precomp   │  .vec files  │
-  └─────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    KEY["Cache Key: runner.os + hashFiles lock"]
+    PUB["Pub Cache - ~/.pub-cache - pubspec.lock"]
+    GRADLE["Gradle - ~/.gradle/ - build.gradle"]
+    COCOA["CocoaPods - ~/Library/Caches/CocoaPods"]
+    KEY --> PUB
+    KEY --> GRADLE
+    KEY --> COCOA
 ```
+
+Performance Budgets:
+
+| Metric          | Budget         | Tool        |
+| --------------- | -------------- | ----------- |
+| Frame render    | less than 16ms | DevTools    |
+| Cold start      | less than 3s   | Stopwatch   |
+| APK size        | less than 25MB | --analyze   |
+| Widget rebuilds | minimal        | select      |
+| List scrolling  | 60fps          | builder+ext |
+| Image loading   | cached         | CachedImg   |
+| SVG rendering   | precomp        | .vec files  |
 
 ---
 
@@ -928,30 +813,22 @@ M9 — CI/CD Pipeline & Performance Budgets:
 
 For every feature, follow this sequence **before writing any code**:
 
-```
-Spec-First Workflow — Visual Pipeline:
+```mermaid
+flowchart LR
+    S1["Step 1: Spec"] --> S2["Step 2: Contract"]
+    S2 --> S3["Step 3: Entities and DTOs"]
+    S3 --> S4["Step 4: Tests First"]
+    S4 --> S5["Step 5: Implement inside-out"]
+    S5 --> S6["Step 6: Wire and Verify"]
+    S6 --> S7["Step 7: Review Checklist"]
 
-  ┌─────┐    ┌─────────┐    ┌──────────┐    ┌───────────┐
-  │STEP │    │  STEP   │    │  STEP    │    │  STEP     │
-  │  1  │───▶│    2    │───▶│    3     │───▶│    4      │
-  │SPEC │    │CONTRACT │    │ENTITIES  │    │  TESTS    │
-  │     │    │         │    │ & DTOs   │    │  FIRST    │
-  └─────┘    └─────────┘    └──────────┘    └─────┬─────┘
-                                                   │
-       ┌───────────────────────────────────────────┘
-       │
-       ▼
-  ┌──────────┐    ┌───────────┐    ┌──────────────┐
-  │  STEP    │    │  STEP     │    │    STEP      │
-  │    5     │───▶│    6      │───▶│      7       │
-  │IMPLEMENT │    │WIRE &     │    │  REVIEW      │
-  │(inside→out)   │VERIFY     │    │  CHECKLIST   │
-  └──────────┘    └───────────┘    └──────────────┘
-
-  Time Flow:
-  ─────────────────────────────────────────────────▶
-  THINK          DEFINE         BUILD       VERIFY
-  (spec+contract) (entities+tests) (impl)   (wire+review)
+    subgraph Phases["Time Flow"]
+        THINK["THINK: spec + contract"]
+        DEFINE["DEFINE: entities + tests"]
+        BUILD["BUILD: implementation"]
+        VERIFY["VERIFY: wire + review"]
+        THINK --> DEFINE --> BUILD --> VERIFY
+    end
 ```
 
 ### Step 1: Spec (Document)
@@ -964,42 +841,20 @@ docs/specs/<feature>-spec.md
 ├── API contract (request/response shapes)
 ├── Screen wireframes (ASCII or Figma link)
 └── Edge cases & error states
+```
 
-  Example:
-  ┌──────────────────────────────────────────────────────┐
-  │  docs/specs/events-spec.md                           │
-  │                                                      │
-  │  ## Problem                                          │
-  │  Users need to discover and browse upcoming events.  │
-  │                                                      │
-  │  ## User Story                                       │
-  │  As a user, I want to see a list of events           │
-  │  so that I can find ones I'm interested in.          │
-  │                                                      │
-  │  ## Acceptance Criteria                              │
-  │  Given I am on the Events screen                     │
-  │  When events load successfully                       │
-  │  Then I see a scrollable list with title, date, loc  │
-  │                                                      │
-  │  ## API Contract                                     │
-  │  GET /api/events → { data: Event[], total: int }     │
-  │                                                      │
-  │  ## Wireframe                                        │
-  │  ┌─────────────────────┐                             │
-  │  │ ◀  Events           │                             │
-  │  │─────────────────────│                             │
-  │  │ 🔍 Search...        │                             │
-  │  │─────────────────────│                             │
-  │  │ ┌─────────────────┐ │                             │
-  │  │ │ Flutter Conf '25│ │                             │
-  │  │ │ Jun 15 • Cairo  │ │                             │
-  │  │ └─────────────────┘ │                             │
-  │  │ ┌─────────────────┐ │                             │
-  │  │ │ Dart Meetup     │ │                             │
-  │  │ │ Jun 22 • Alex   │ │                             │
-  │  │ └─────────────────┘ │                             │
-  │  └─────────────────────┘                             │
-  └──────────────────────────────────────────────────────┘
+Example spec structure:
+
+```mermaid
+flowchart TD
+    subgraph Spec["docs/specs/events-spec.md"]
+        PROBLEM["Problem: Users need to discover and browse upcoming events"]
+        STORY["User Story: As a user, I want to see a list of events"]
+        CRITERIA["Acceptance Criteria: Given Events screen, When loaded, Then scrollable list"]
+        CONTRACT["API Contract: GET /api/events returns data Event array and total"]
+        WIREFRAME["Wireframe: Events screen with search bar and event cards"]
+        PROBLEM --> STORY --> CRITERIA --> CONTRACT --> WIREFRAME
+    end
 ```
 
 ### Step 2: Contract (Interfaces)
@@ -1057,89 +912,75 @@ abstract class FeatureRepository {
 
 ### Step 5: Implementation (Inside-Out)
 
-```
-1. Data layer: API service (Retrofit) → DAO (Drift) → Repository impl
-2. State layer: Controller (AsyncNotifier)
-3. UI layer: Screen (ConsumerWidget)
+```mermaid
+flowchart TD
+    subgraph UI["3 - UI Layer"]
+        SCREEN["ConsumerWidget Screen - ref.watch controller"]
+    end
 
-  Build Direction (inside → out):
+    subgraph STATE["2 - State Layer"]
+        NOTIFIER["AsyncNotifier - AsyncValue.guard"]
+    end
 
-  ┌──────────────────────────────────────────────────────────┐
-  │                                                          │
-  │                    ③ UI Layer                             │
-  │           ┌──────────────────────────┐                   │
-  │           │  ConsumerWidget Screen   │                   │
-  │           │  ref.watch(controller)   │                   │
-  │           └────────────┬─────────────┘                   │
-  │                        │ watches                         │
-  │                        ▼                                 │
-  │                 ② State Layer                            │
-  │           ┌──────────────────────────┐                   │
-  │           │  AsyncNotifier           │                   │
-  │           │  AsyncValue.guard(...)   │                   │
-  │           └────────────┬─────────────┘                   │
-  │                        │ calls                           │
-  │                        ▼                                 │
-  │              ① Data Layer  (BUILD FIRST)                 │
-  │   ┌──────────────┬───────────────┬───────────────┐       │
-  │   │ Retrofit API │   Drift DAO   │  Repository   │       │
-  │   │ (network)    │   (cache)     │  (orchestrate)│       │
-  │   └──────────────┴───────────────┴───────────────┘       │
-  │                                                          │
-  └──────────────────────────────────────────────────────────┘
+    subgraph DATA["1 - Data Layer - BUILD FIRST"]
+        API["Retrofit API - network"]
+        DAO["Drift DAO - cache"]
+        REPO["Repository - orchestrate"]
+    end
+
+    SCREEN -->|"watches"| NOTIFIER
+    NOTIFIER -->|"calls"| API
+    NOTIFIER -->|"calls"| DAO
+    NOTIFIER -->|"calls"| REPO
 ```
 
 ### Step 6: Wire & Verify
 
-```
-1. Add providers to feature's providers.dart
-2. Add routes to feature's routes.dart
-3. Run build_runner
-4. Run tests
-5. Manual smoke test
-6. Check coverage: flutter test --coverage
+```mermaid
+flowchart LR
+    PROV["providers.dart: Export repo + controller providers"]
+    ROUTES["routes.dart: Add GoRoute + screen path"]
+    BUILD["build_runner: Generate .g.dart + .freezed.dart"]
+    TESTS["Run tests"]
+    PASS{"All pass?"}
+    SMOKE["Smoke test - done"]
+    FIX["Fix and rerun"]
 
-  Wiring Checklist Flow:
-
-  providers.dart ──▶ routes.dart ──▶ build_runner ──▶ tests
-       │                 │                │              │
-       ▼                 ▼                ▼              ▼
-  Export repo +     Add GoRoute      Generate .g.dart   All pass?
-  controller         + screen        + .freezed.dart       │
-  providers           path                              ┌──┴──┐
-                                                        │ YES │ → smoke test ✓
-                                                        │ NO  │ → fix & rerun
-                                                        └─────┘
+    PROV --> ROUTES --> BUILD --> TESTS --> PASS
+    PASS -->|"YES"| SMOKE
+    PASS -->|"NO"| FIX --> TESTS
 ```
 
 ### Step 7: Review Checklist
 
-```
-  ┌─────────────────────────────────────────────────────────────┐
-  │                    REVIEW CHECKLIST                         │
-  │                                                             │
-  │  ── i18n ──────────────────────────────────────────────     │
-  │  □ No hardcoded strings (all through t.key)                 │
-  │  □ New strings added to all locale YAML files               │
-  │                                                             │
-  │  ── Theming ───────────────────────────────────────────     │
-  │  □ No hardcoded colors (all through colorScheme/appColors)  │
-  │                                                             │
-  │  ── Architecture ──────────────────────────────────────     │
-  │  □ No direct Dio usage in presentation/domain               │
-  │  □ Repository exposed as abstract type                      │
-  │  □ Controller uses AsyncValue.guard()                       │
-  │  □ Error states handled in .when()                          │
-  │                                                             │
-  │  ── Performance ───────────────────────────────────────     │
-  │  □ const constructors where possible                        │
-  │  □ select() used for expensive watches                      │
-  │                                                             │
-  │  ── Testing ───────────────────────────────────────────     │
-  │  □ Tests cover success, error, loading, and edge cases      │
-  │                                                             │
-  │  ALL CHECKED? ───▶ ✅ MERGE-READY                          │
-  └─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph I18N["i18n"]
+        I1["No hardcoded strings - all through t.key"]
+        I2["New strings added to all locale YAML files"]
+    end
+
+    subgraph THEME["Theming"]
+        T1["No hardcoded colors - all through colorScheme/appColors"]
+    end
+
+    subgraph ARCH["Architecture"]
+        A1["No direct Dio usage in presentation/domain"]
+        A2["Repository exposed as abstract type"]
+        A3["Controller uses AsyncValue.guard"]
+        A4["Error states handled in .when"]
+    end
+
+    subgraph PERF["Performance"]
+        P1["const constructors where possible"]
+        P2["select used for expensive watches"]
+    end
+
+    subgraph TEST["Testing"]
+        TE1["Tests cover success, error, loading, and edge cases"]
+    end
+
+    I18N --> THEME --> ARCH --> PERF --> TEST --> MERGE["ALL CHECKED - MERGE-READY"]
 ```
 
 ---
