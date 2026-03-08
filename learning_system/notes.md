@@ -32,57 +32,65 @@ A **DTO (Data Transfer Object)** is a simple class used to transfer data between
 
 ---
 
-## Mermaid Diagram: API → DTO → Entity Flow
+## Professional Mermaid Diagrams: DTO & Mapping
 
-```
+### API → DTO → Entity → UI Flow
+
+```mermaid
 flowchart LR
-    API[API Response]
-    DTO[EventDto]
-    Entity[Event]
-    API --> DTO --> Entity
+    API[API Server] --> DTO[Event DTO]
+    DTO --> Entity[Event Entity]
+    Entity --> UI[Flutter UI]
+
+    classDef api fill:#ffcc99,stroke:#333
+    classDef dto fill:#99ccff,stroke:#333
+    classDef entity fill:#99ff99,stroke:#333
+    classDef ui fill:#d5a6ff,stroke:#333
+
+    class API api
+    class DTO dto
+    class Entity entity
+    class UI ui
 ```
 
----
+### Clean Architecture Data Flow
 
-## Clean Architecture Data Flow
-
-```
+```mermaid
 flowchart LR
-    API[API]
-    DataLayer[Data Layer (DTO)]
-    DomainLayer[Domain Layer (Entity)]
-    UILayer[UI Layer]
-    API --> DataLayer --> DomainLayer --> UILayer
+    API[API Server]:::api --> DataLayer[DTO Layer]:::dto
+    DataLayer --> DomainLayer[Domain Entity Layer]:::entity
+    DomainLayer --> UILayer[UI Layer]:::ui
+
+    classDef api fill:#ffcc99,stroke:#333
+    classDef dto fill:#99ccff,stroke:#333
+    classDef entity fill:#99ff99,stroke:#333
+    classDef ui fill:#d5a6ff,stroke:#333
+
+    class API api
+    class DataLayer dto
+    class DomainLayer entity
+    class UILayer ui
 ```
 
----
+### DTO to Entity Mapping Sequence
 
-## DTO Mapping
-
-**DTO Mapping** is the process of converting a DTO to a domain entity.
-
-- Keeps your domain models clean and independent from API quirks.
-- Usually done via a `toEntity()` method in the DTO class.
-
----
-
-## Mermaid Diagram: DTO to Entity Mapping
-
-```
+```mermaid
 sequenceDiagram
-    participant API
-    participant DTO
-    participant Entity
+    participant API as API Server
+    participant DTO as Event DTO
+    participant Entity as Event Entity
+    participant UI as Flutter UI
+
     API->>DTO: fromJson()
     DTO->>Entity: toEntity()
     Entity->>UI: Use in widgets
+
+    %% Styling not supported in sequence diagrams, but labels are clear
 ```
 
----
+### Class Diagram: DTO vs Entity
 
-## Class Diagram: DTO vs Entity
-
-```
+```mermaid
 classDiagram
     class EventDto {
         +String id
@@ -102,6 +110,11 @@ classDiagram
         +String venue
     }
     EventDto : toEntity() --> Event
+
+    classDef dto fill:#99ccff,stroke:#333
+    classDef entity fill:#99ff99,stroke:#333
+    class EventDto dto
+    class Event entity
 ```
 
 ---
