@@ -114,8 +114,7 @@ flowchart LR
 - Build a feature with full provider graph: API service → repository → controller → screen
 - Demonstrate `select()` optimization with DevTools rebuild tracking
 
-````
-Phase 2 — Riverpod Provider Graph:
+**Phase 2 — Riverpod Provider Graph:**
 
 ```mermaid
 flowchart TD
@@ -138,12 +137,10 @@ flowchart TD
   style UI fill:#ffd600,stroke:#ff6f00,stroke-width:2px
 ```
 
-ref.watch → reactive (rebuilds UI on change)
-ref.read → one-shot (callbacks, event handlers)
-ref.listen → side effects (snackbars, navigation)
-select() → watch only a subset (minimize rebuilds)
-
-```
+> ref.watch → reactive (rebuilds UI on change)
+> ref.read → one-shot (callbacks, event handlers)
+> ref.listen → side effects (snackbars, navigation)
+> select() → watch only a subset (minimize rebuilds)
 
 ---
 
@@ -168,9 +165,7 @@ select() → watch only a subset (minimize rebuilds)
 - Retrofit API service + Drift DAO for one feature
 - Repository implementation with cache fallback on network error
 
-```
-```
-Phase 3 — The Data Pipeline:
+**Phase 3 — The Data Pipeline:**
 
 ```mermaid
 flowchart TD
@@ -218,10 +213,7 @@ flowchart TD
 - Full login → authenticated → token refresh → logout → redirect cycle
 - Simulate 401 → refresh → retry flow
 
-````
-
-````
-Phase 4 — Auth Lifecycle:
+**Phase 4 — Auth Lifecycle:**
 
 ```mermaid
 flowchart TD
@@ -277,9 +269,7 @@ flowchart TD
 - One screen rendered responsively on phone + tablet
 - Two locales with full coverage
 
-````
-
-Phase 5 — Theming & Responsive Architecture:
+**Phase 5 — Theming & Responsive Architecture:**
 
 ```mermaid
 graph TD
@@ -332,8 +322,7 @@ graph TD
 - Push notification received in foreground, tapped → navigated to correct screen
 - QR scan → process result → navigate
 
-````
-Phase 6 — Platform Integration Map:
+**Phase 6 — Platform Integration Map:**
 
 ```mermaid
 flowchart TD
@@ -387,9 +376,7 @@ flowchart TD
 - Widget test for every screen
 - One end-to-end integration test
 
-````
-
-Phase 7 — Testing Pyramid:
+**Phase 7 — Testing Pyramid:**
 
 ```mermaid
 flowchart TD
@@ -437,8 +424,7 @@ flowchart TD
 - CI pipeline passing on every push
 - Beta distributed via Firebase App Distribution
 
-````
-Phase 8 — CI/CD Pipeline:
+**Phase 8 — CI/CD Pipeline:**
 
 ```mermaid
 flowchart TD
@@ -524,12 +510,3 @@ Week   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
 
   P = Phase    ███ = Active learning + building
 ```
-
-```
-
-```
-
-```
-
-```
-````
