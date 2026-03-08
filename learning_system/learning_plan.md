@@ -219,6 +219,7 @@ flowchart TD
 - Simulate 401 → refresh → retry flow
 
 ````
+
 Phase 4 — Auth Lifecycle:
 
 ```mermaid
@@ -387,32 +388,28 @@ flowchart TD
 ```
 Phase 7 — Testing Pyramid:
 
-                        ╱╲
-                       ╱  ╲
-                      ╱    ╲
-                     ╱ Integ╲          1 per major feature
-                    ╱ ration ╲         Full flows: login → browse → buy
-                   ╱──────────╲
-                  ╱            ╲
-                 ╱    Widget    ╲       Every screen: data + loading + error
-                ╱    Tests      ╲      pumpWidget → pumpAndSettle → find.*
-               ╱────────────────╲
-              ╱                  ╲
-             ╱     Unit Tests     ╲    Entities, repos, controllers, DAOs
-            ╱   (fastest, most)    ╲   ProviderContainer + mocktail
-           ╱────────────────────────╲
-          ╱                          ╲
-         ╱      80%+ line coverage    ╲
-        ╱──────────────────────────────╲
-
-  Test Tool Kit:
-  ┌───────────────┐  ┌───────────────┐  ┌──────────────────┐
-  │   mocktail    │  │ ProviderScope │  │   Drift          │
-  │               │  │   overrides   │  │   in-memory DB   │
-  │ Mock classes  │  │               │  │                  │
-  │ when().then() │  │ testApp()     │  │ NativeDatabase   │
-  │ verify()      │  │ wrapper       │  │   .memory()      │
-  └───────────────┘  └───────────────┘  └──────────────────┘
+```mermaid
+flowchart TD
+  E2E[E2E Integration Test] --> Widget[Widget Tests]
+  Widget --> Unit[Unit Tests]
+  Unit --> Coverage[80%+ line coverage]
+  E2E --> Coverage
+  Widget --> Coverage
+  Unit --> Coverage
+  E2E --> Toolkit[Test Tool Kit]
+  Widget --> Toolkit
+  Unit --> Toolkit
+  Toolkit --> Mocktail[mocktail]
+  Toolkit --> ProviderScope[ProviderScope overrides]
+  Toolkit --> Drift[Drift in-memory DB]
+  style E2E fill:#e3f2fd,stroke:#2196f3
+  style Widget fill:#fffde7,stroke:#ffeb3b
+  style Unit fill:#e8f5e9,stroke:#43a047
+  style Coverage fill:#ffd600,stroke:#ff6f00,stroke-width:2px
+  style Toolkit fill:#b2dfdb,stroke:#00897b
+  style Mocktail fill:#ffe0b2,stroke:#fb8c00
+  style ProviderScope fill:#c8e6c9,stroke:#388e3c
+  style Drift fill:#d1c4e9,stroke:#7e57c2
 ```
 
 ---
@@ -538,3 +535,5 @@ Week   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
 
   P = Phase    ███ = Active learning + building
 ```
+```
+````
