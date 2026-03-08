@@ -305,10 +305,10 @@ Milestone Timeline:
 
 **Concepts:** C2, C3, C16
 
-- [ ] Initialize Flutter project with proper directory structure
-- [ ] Configure `pubspec.yaml` with all dependencies
-- [ ] Set up `build.yaml` for all generators
-- [ ] Create Freezed entities: `Event`, `Ticket`, `User`, `CheckInResult`
+- [x] Initialize Flutter project with proper directory structure
+- [x] Configure `pubspec.yaml` with all dependencies
+- [x] Set up `build.yaml` for all generators
+- [x] Create Freezed entities: `Event`, `Ticket`, `User`, `CheckInResult`
 - [ ] Create DTOs with `@JsonSerializable` and `toEntity()` methods
 - [ ] Set up barrel files for each feature
 - [ ] Configure environment JSON files (`dev.json`, `staging.json`, `prod.json`)
