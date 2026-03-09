@@ -347,13 +347,13 @@ M1 — What You Build:
 **Concepts:** C1, C3
 
 - [x] Create `dioProvider` (singleton, `keepAlive`)
-- [ ] Wire feature provider graphs: API → Repository → Controller
-- [ ] Implement `EventListController` (AsyncNotifier) with pagination
-- [ ] Implement `EventDetailController` with family provider (`build(String eventId)`)
-- [ ] Create derived provider: `upcomingEventsProvider` (filtered)
-- [ ] Demonstrate `select()` optimization on event count
-- [ ] Wire `ref.listen` for showing error snackbars
-- [ ] Implement `ref.invalidateSelf()` for pull-to-refresh
+- [x] Wire feature provider graphs: API → Repository → Controller
+- [x] Implement `EventListController` (AsyncNotifier) with pagination
+- [x] Implement `EventDetailController` with family provider (`build(String eventId)`)
+- [x] Create derived provider: `upcomingEventsProvider` (filtered)
+- [x] Demonstrate `select()` optimization on event count
+- [x] Wire `ref.listen` for showing error snackbars
+- [x] Implement `ref.invalidateSelf()` for pull-to-refresh
 
 **Exit Criteria:** Full Riverpod provider graph for events feature. Loading → Data → Error states all handled.
 
