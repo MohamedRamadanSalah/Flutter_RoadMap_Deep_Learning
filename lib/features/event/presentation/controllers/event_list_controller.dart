@@ -38,7 +38,7 @@ class EventListController extends _$EventListController {
     return ref
         .watch(eventRepositoryProvider)
         .getEvents(page: 1, pageSize: _pageSize);
-  }
+     }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Pagination — append next page without losing existing data

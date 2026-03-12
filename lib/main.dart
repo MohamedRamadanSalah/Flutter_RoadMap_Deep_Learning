@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/event/presentation/screens/event_list_screen.dart';
+import 'package:testing_state_managment_riverpod/features/posts/presentation/screens/post_list_screen.dart';
 
 void main() {
-  runApp(
-    // ProviderScope is the root of the Riverpod provider graph.
-    // Every Provider, AsyncNotifier, and derived provider lives inside this scope.
-    // In tests, you wrap with ProviderContainer instead.
-    const ProviderScope(child: EventHubApp()),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class EventHubApp extends StatelessWidget {
-  const EventHubApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'EventHub',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF2196F3),
-        useMaterial3: true,
-      ),
-      home: const EventListScreen(),
-    );
+    return MaterialApp(title: 'Posts App', home: const PostListScreen());
   }
 }

@@ -42,7 +42,7 @@ abstract class _$EventDetailController
 /// FAMILY PROVIDER: the [eventId] parameter makes this a "family" — Riverpod
 /// creates one independent instance per unique [eventId].
 ///
-///   eventDetailControllerProvider('event-1')  → own AsyncValue<Event>
+///   eventDetailControllerProvider('event-1')  → own AsyncValue for Event
 ///   eventDetailControllerProvider('event-7')  → completely separate instance
 ///
 /// Each instance is auto-disposed when its screen leaves the navigation stack.
@@ -58,7 +58,7 @@ const eventDetailControllerProvider = EventDetailControllerFamily();
 /// FAMILY PROVIDER: the [eventId] parameter makes this a "family" — Riverpod
 /// creates one independent instance per unique [eventId].
 ///
-///   eventDetailControllerProvider('event-1')  → own AsyncValue<Event>
+///   eventDetailControllerProvider('event-1')  → own AsyncValue for Event
 ///   eventDetailControllerProvider('event-7')  → completely separate instance
 ///
 /// Each instance is auto-disposed when its screen leaves the navigation stack.
@@ -72,7 +72,7 @@ class EventDetailControllerFamily extends Family<AsyncValue<Event>> {
   /// FAMILY PROVIDER: the [eventId] parameter makes this a "family" — Riverpod
   /// creates one independent instance per unique [eventId].
   ///
-  ///   eventDetailControllerProvider('event-1')  → own AsyncValue<Event>
+  ///   eventDetailControllerProvider('event-1')  → own AsyncValue for Event
   ///   eventDetailControllerProvider('event-7')  → completely separate instance
   ///
   /// Each instance is auto-disposed when its screen leaves the navigation stack.
@@ -87,7 +87,7 @@ class EventDetailControllerFamily extends Family<AsyncValue<Event>> {
   /// FAMILY PROVIDER: the [eventId] parameter makes this a "family" — Riverpod
   /// creates one independent instance per unique [eventId].
   ///
-  ///   eventDetailControllerProvider('event-1')  → own AsyncValue<Event>
+  ///   eventDetailControllerProvider('event-1')  → own AsyncValue for Event
   ///   eventDetailControllerProvider('event-7')  → completely separate instance
   ///
   /// Each instance is auto-disposed when its screen leaves the navigation stack.
@@ -126,7 +126,7 @@ class EventDetailControllerFamily extends Family<AsyncValue<Event>> {
 /// FAMILY PROVIDER: the [eventId] parameter makes this a "family" — Riverpod
 /// creates one independent instance per unique [eventId].
 ///
-///   eventDetailControllerProvider('event-1')  → own AsyncValue<Event>
+///   eventDetailControllerProvider('event-1')  → own AsyncValue for Event
 ///   eventDetailControllerProvider('event-7')  → completely separate instance
 ///
 /// Each instance is auto-disposed when its screen leaves the navigation stack.
@@ -141,7 +141,7 @@ class EventDetailControllerProvider
   /// FAMILY PROVIDER: the [eventId] parameter makes this a "family" — Riverpod
   /// creates one independent instance per unique [eventId].
   ///
-  ///   eventDetailControllerProvider('event-1')  → own AsyncValue<Event>
+  ///   eventDetailControllerProvider('event-1')  → own AsyncValue for Event
   ///   eventDetailControllerProvider('event-7')  → completely separate instance
   ///
   /// Each instance is auto-disposed when its screen leaves the navigation stack.
